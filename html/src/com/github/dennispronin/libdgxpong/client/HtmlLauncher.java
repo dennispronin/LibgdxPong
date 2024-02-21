@@ -3,7 +3,7 @@ package com.github.dennispronin.libdgxpong.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import com.dennispronin.dennispronin.libdgxpong.LibgdxPong;
+import com.github.dennispronin.libdgxpong.LibgdxPong;
 
 public class HtmlLauncher extends GwtApplication {
 
