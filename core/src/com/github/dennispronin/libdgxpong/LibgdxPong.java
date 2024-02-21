@@ -13,22 +13,14 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.Random;
 
+import static com.github.dennispronin.libdgxpong.Constants.*;
+
 public class LibgdxPong extends ApplicationAdapter {
 
-    private final float windowHeight = 480f;
-    private final float windowWidth = 800f;
-
-    private final float rectangleWidth = 24f;
-    private final float rectangleHeight = 90f;
-
-    private static final float INITIAL_BALL_SPEED = 4f;
-    private static final float BALL_SPEED_LIMIT = 10f;
     private float ballSpeed = INITIAL_BALL_SPEED;
     private float ballNextX;
     private float ballNextY;
     private final Random random = new Random();
-
-    private static final double RECTANGLE_SPEED = 8f;
 
     private OrthographicCamera camera;
     private SpriteBatch spriteBatch;
@@ -37,13 +29,17 @@ public class LibgdxPong extends ApplicationAdapter {
     private Texture rectangleImage;
     private Sound ballSound;
 
-    private Circle ball;
+    private Rectangle ball;
     private Rectangle leftRectangle;
     private Rectangle rightRectangle;
     private Rectangle centerLine;
 
     private int player1Score = 0;
-    private int player2Score = 0;
+    /**
+     * For some reason the ball's initial x is 0, even though I set it in the create()
+     * It leads to scoreHit() being triggered and player2Score being incremented
+     */
+    private int player2Score = -1;
 
     @Override
     public void create() {
@@ -51,38 +47,38 @@ public class LibgdxPong extends ApplicationAdapter {
         rectangleImage = new Texture(Gdx.files.internal("rectangle.png"));
         ballSound = Gdx.audio.newSound(Gdx.files.internal("ball.wav"));
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, windowWidth, windowHeight);
+        camera.setToOrtho(false, WINDOW_WIDTH, WINDOW_HEIGHT);
         spriteBatch = new SpriteBatch();
 
         leftRectangle = new Rectangle();
         leftRectangle.x = 0;
-        leftRectangle.y = windowHeight / 2 - rectangleHeight / 2;
-        leftRectangle.width = rectangleWidth;
-        leftRectangle.height = rectangleHeight;
+        leftRectangle.y = WINDOW_HEIGHT / 2 - RECTANGLE_HEIGHT / 2;
+        leftRectangle.width = RECTANGLE_WIDTH;
+        leftRectangle.height = RECTANGLE_HEIGHT;
 
         rightRectangle = new Rectangle();
-        rightRectangle.y = windowHeight / 2 - rectangleHeight / 2;
-        rightRectangle.x = windowWidth - rectangleWidth;
-        rightRectangle.width = rectangleWidth;
-        rightRectangle.height = rectangleHeight;
+        rightRectangle.y = WINDOW_HEIGHT / 2 - RECTANGLE_HEIGHT / 2;
+        rightRectangle.x = WINDOW_WIDTH - RECTANGLE_WIDTH;
+        rightRectangle.width = RECTANGLE_WIDTH;
+        rightRectangle.height = RECTANGLE_HEIGHT;
 
         centerLine = new Rectangle();
         centerLine.y = 0;
-        centerLine.x = windowWidth / 2 - 3;
+        centerLine.x = WINDOW_WIDTH / 2 - 3;
         centerLine.width = 3;
-        centerLine.height = windowHeight;
+        centerLine.height = WINDOW_HEIGHT;
 
-        ball = new Circle();
-        ball.radius = 40f;
-        ball.y = windowHeight / 2 - ball.radius / 2;
-        ball.x = windowWidth / 2 - ball.radius / 2;
+        ball = new Rectangle();
+        ball.width = 40f;
+        ball.height = 40f;
+        ball.y = WINDOW_HEIGHT / 2 - ball.width / 2;
+        ball.x = WINDOW_WIDTH / 2 - ball.width / 2;
     }
 
     @Override
     public void render() {
         ScreenUtils.clear(Color.BLACK);
         camera.update();
-
         drawObjects();
         handleBall();
         handleKeyPressed();
@@ -91,10 +87,11 @@ public class LibgdxPong extends ApplicationAdapter {
     private void drawObjects() {
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
-        spriteBatch.draw(rectangleImage, leftRectangle.x, leftRectangle.y, rectangleWidth, rectangleHeight);
-        spriteBatch.draw(rectangleImage, rightRectangle.x, rightRectangle.y, rectangleWidth, rectangleHeight);
-        spriteBatch.draw(rectangleImage, centerLine.x, centerLine.y, 3, windowHeight);
-        spriteBatch.draw(ballImage, ball.x, ball.y, ball.radius, ball.radius);
+        spriteBatch.draw(ballImage, ball.x, ball.y, ball.width, ball.width);
+
+        spriteBatch.draw(rectangleImage, leftRectangle.x, leftRectangle.y, RECTANGLE_WIDTH, RECTANGLE_HEIGHT);
+        spriteBatch.draw(rectangleImage, rightRectangle.x, rightRectangle.y, RECTANGLE_WIDTH, RECTANGLE_HEIGHT);
+        spriteBatch.draw(rectangleImage, centerLine.x, centerLine.y, 3, WINDOW_HEIGHT);
         spriteBatch.end();
     }
 
@@ -102,12 +99,12 @@ public class LibgdxPong extends ApplicationAdapter {
         if (Gdx.input.isKeyPressed(Input.Keys.S)) leftRectangle.y -= RECTANGLE_SPEED;
         if (Gdx.input.isKeyPressed(Input.Keys.W)) leftRectangle.y += RECTANGLE_SPEED;
         if (leftRectangle.y < 0) leftRectangle.y = 0;
-        if (leftRectangle.y > windowHeight - rectangleHeight) leftRectangle.y = windowHeight - rectangleHeight;
+        if (leftRectangle.y > WINDOW_HEIGHT - RECTANGLE_HEIGHT) leftRectangle.y = WINDOW_HEIGHT - RECTANGLE_HEIGHT;
 
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) rightRectangle.y -= RECTANGLE_SPEED;
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) rightRectangle.y += RECTANGLE_SPEED;
         if (rightRectangle.y < 0) rightRectangle.y = 0;
-        if (rightRectangle.y > windowHeight - rectangleHeight) rightRectangle.y = windowHeight - rectangleHeight;
+        if (rightRectangle.y > WINDOW_HEIGHT - RECTANGLE_HEIGHT) rightRectangle.y = WINDOW_HEIGHT - RECTANGLE_HEIGHT;
     }
 
     private void handleBall() {
@@ -127,34 +124,35 @@ public class LibgdxPong extends ApplicationAdapter {
     }
 
     private boolean isScoreHit() {
-        return ball.x - ball.radius <= 0 || ball.x + ball.radius >= windowWidth;
+        return ball.x <= 0 || ball.x + ball.width >= WINDOW_WIDTH;
     }
 
     public void scoreHit() {
-        if (ball.x - ball.radius == 0) {
+        // fixme change to precise value
+        if (ball.x <= 0) {
             player2Score++;
-        } else if (ball.x + ball.radius == windowWidth) {
+        // fixme change to precise value
+        } else if (ball.x + ball.width >= WINDOW_WIDTH) {
             player1Score++;
         }
     }
 
     private void moveBallForward(double vectorX, double vectorY) {
         if (vectorX > 0) {
-            if (ball.x + ballSpeed + ball.radius < windowWidth) {
+            if (ball.x + ballSpeed + ball.width < WINDOW_WIDTH) {
                 ballNextX += ballSpeed;
             } else {
-                ballNextX += windowWidth - ball.x - ball.radius;
+                ballNextX += WINDOW_WIDTH - ball.x - ball.width;
             }
-        }
-        else if (vectorX < 0) {
-            if (ball.x - ballSpeed - ball.radius > 0) {
+        } else if (vectorX < 0) {
+            if (ball.x - ballSpeed > 0) {
                 ballNextX -= ballSpeed;
             } else {
-                ballNextX -= ball.x - ball.radius;
+                ballNextX -= ball.x;
             }
         }
         if (vectorY > 0) {
-            if (ball.y + ballSpeed + ball.radius > windowHeight) {
+            if (ball.y + ballSpeed + ball.width > WINDOW_HEIGHT) {
                 ballNextY -= ballSpeed;
             } else {
                 ballNextY += ballSpeed;
@@ -197,8 +195,8 @@ public class LibgdxPong extends ApplicationAdapter {
     }
 
     private void resetBall() {
-        ball.x = windowWidth / 2 - ball.radius / 2;
-        ball.y = windowHeight / 2 - ball.radius / 2;
+        ball.x = WINDOW_WIDTH / 2 - ball.width / 2;
+        ball.y = WINDOW_HEIGHT / 2 - ball.width / 2;
         ballSpeed = INITIAL_BALL_SPEED;
         defineBallInitialDirection();
     }
