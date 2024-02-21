@@ -1,4 +1,4 @@
-package com.dennispronin.dennispronin.libdgxpong;
+package com.github.dennispronin.libdgxpong;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.graphics.Texture;

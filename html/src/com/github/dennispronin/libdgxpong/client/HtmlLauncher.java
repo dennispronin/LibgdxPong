@@ -1,4 +1,4 @@
-package com.dennispronin.dennispronin.libdgxpong.client;
+package com.github.dennispronin.libdgxpong.client;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
