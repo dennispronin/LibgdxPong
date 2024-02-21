@@ -10,7 +10,7 @@ public class DesktopLauncher {
 		config.setWindowIcon("icon.png");
 		config.setTitle("Pong");
 		config.setResizable(false);
-		config.setWindowedMode(700, 400);
+		config.setWindowedMode(800, 480);
 		config.useVsync(true);
 		config.setForegroundFPS(60);
 		new Lwjgl3Application(new LibgdxPong(), config);
