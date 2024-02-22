@@ -7,6 +7,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -24,6 +25,8 @@ public class LibgdxPong extends ApplicationAdapter {
 
     private OrthographicCamera camera;
     private SpriteBatch spriteBatch;
+
+    public BitmapFont font;
 
     private Texture ballImage;
     private Texture rectangleImage;
@@ -49,6 +52,8 @@ public class LibgdxPong extends ApplicationAdapter {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, WINDOW_WIDTH, WINDOW_HEIGHT);
         spriteBatch = new SpriteBatch();
+
+        font = new BitmapFont();
 
         leftRectangle = new Rectangle();
         leftRectangle.x = 0;
@@ -88,6 +93,9 @@ public class LibgdxPong extends ApplicationAdapter {
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
         spriteBatch.draw(ballImage, ball.x, ball.y, ball.width, ball.width);
+
+        font.draw(spriteBatch, String.valueOf(player1Score), WINDOW_WIDTH / 2 - 20, WINDOW_HEIGHT - 20);
+        font.draw(spriteBatch, String.valueOf(player2Score), WINDOW_WIDTH / 2 + 8, WINDOW_HEIGHT - 20);
 
         spriteBatch.draw(rectangleImage, leftRectangle.x, leftRectangle.y, RECTANGLE_WIDTH, RECTANGLE_HEIGHT);
         spriteBatch.draw(rectangleImage, rightRectangle.x, rightRectangle.y, RECTANGLE_WIDTH, RECTANGLE_HEIGHT);
@@ -223,6 +231,7 @@ public class LibgdxPong extends ApplicationAdapter {
 
     @Override
     public void dispose() {
+        font.dispose();
         ballImage.dispose();
         rectangleImage.dispose();
         ballSound.dispose();
