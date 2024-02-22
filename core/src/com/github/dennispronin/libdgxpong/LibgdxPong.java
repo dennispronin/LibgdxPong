@@ -26,7 +26,7 @@ public class LibgdxPong extends ApplicationAdapter {
     private OrthographicCamera camera;
     private SpriteBatch spriteBatch;
 
-    public BitmapFont font;
+    private BitmapFont font;
 
     private Texture ballImage;
     private Texture rectangleImage;
@@ -136,10 +136,8 @@ public class LibgdxPong extends ApplicationAdapter {
     }
 
     public void scoreHit() {
-        // fixme change to precise value
         if (ball.x <= 0) {
             player2Score++;
-        // fixme change to precise value
         } else if (ball.x + ball.width >= WINDOW_WIDTH) {
             player1Score++;
         }
