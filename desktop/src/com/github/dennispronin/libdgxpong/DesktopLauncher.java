@@ -2,6 +2,7 @@ package com.github.dennispronin.libdgxpong;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.PongGame;
 
 import static com.github.dennispronin.libdgxpong.Constants.WINDOW_HEIGHT;
 import static com.github.dennispronin.libdgxpong.Constants.WINDOW_WIDTH;
@@ -16,6 +17,6 @@ public class DesktopLauncher {
         config.setWindowedMode((int) WINDOW_WIDTH, (int) WINDOW_HEIGHT);
         config.useVsync(true);
         config.setForegroundFPS(60);
-        new Lwjgl3Application(new LibgdxPong(), config);
+        new Lwjgl3Application(new PongGame(), config);
     }
 }
