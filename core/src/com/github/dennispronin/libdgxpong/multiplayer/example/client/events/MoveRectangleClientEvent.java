@@ -2,8 +2,11 @@ package com.github.dennispronin.libdgxpong.multiplayer.example.client.events;
 
 public class MoveRectangleClientEvent {
 
-    private final String sessionId;
-    private final float rectangleY;
+    private String sessionId;
+    private float rectangleY;
+
+    public MoveRectangleClientEvent() {
+    }
 
     public MoveRectangleClientEvent(String sessionId, float rectangleY) {
         this.sessionId = sessionId;

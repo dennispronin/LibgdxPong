@@ -2,7 +2,11 @@ package com.github.dennispronin.libdgxpong.multiplayer.example.client.events;
 
 public class CreateSessionClientEvent {
 
-    private final String sessionPassword;
+    private String sessionPassword;
+
+    public CreateSessionClientEvent() {
+
+    }
 
     public CreateSessionClientEvent(String sessionPassword) {
         this.sessionPassword = sessionPassword;

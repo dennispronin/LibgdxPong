@@ -52,7 +52,7 @@ public class PongServer {
                 super.received(connection, object);
             }
         });
-        server.bind(SERVER_PORT);
+        server.bind(SERVER_PORT, SERVER_PORT);
         server.start();
     }
 
@@ -86,7 +86,7 @@ public class PongServer {
             return;
         }
         GameSession session = new GameSession();
-        String sessionId = UUID.randomUUID().toString();
+        String sessionId = UUID.randomUUID().toString().substring(0, 8);
         while (gameSessions.containsKey(sessionId)) {
             sessionId = UUID.randomUUID().toString();
         }

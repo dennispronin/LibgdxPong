@@ -4,8 +4,11 @@ import com.github.dennispronin.libdgxpong.multiplayer.example.client.PlayerSide;
 
 public class ScoreHitClientEvent {
 
-    private final PlayerSide playerSide;
-    private final String sessionId;
+    private PlayerSide playerSide;
+    private String sessionId;
+
+    public ScoreHitClientEvent() {
+    }
 
     public ScoreHitClientEvent(PlayerSide playerSide, String sessionId) {
         this.playerSide = playerSide;

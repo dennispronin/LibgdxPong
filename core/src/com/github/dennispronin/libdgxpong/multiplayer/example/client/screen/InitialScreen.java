@@ -13,6 +13,8 @@ import com.github.dennispronin.libdgxpong.multiplayer.example.client.EventListen
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.CreateSessionClientEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.JoinSessionClientEvent;
 
+import java.io.IOException;
+
 import static com.github.dennispronin.libdgxpong.Constants.*;
 import static com.github.dennispronin.libdgxpong.Network.SERVER_HOST;
 import static com.github.dennispronin.libdgxpong.Network.SERVER_PORT;
@@ -48,12 +50,19 @@ public class InitialScreen implements Screen {
         this.joinButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                connectToServer();
+                try {
+                    connectToServer();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    menuLayout.clear();
+                    menuLayout.add(new Label("Server connection failed. Try again.", skin)).width(250).row();
+                    return super.touchDown(event, x, y, pointer, button);
+                }
                 client.sendTCP(new JoinSessionClientEvent(sessionPassword.getText(), sessionId.getText()));
                 // fixme если такой сессии нет, то нужно это обрабатывать каким-то листенером
                 //  надо в лейбеле заменять надпись на то, что такой сессии нет
                 menuLayout.clear();
-                menuLayout.add(new Label("Joininlg game session", skin)).width(250).row();
+                menuLayout.add(new Label("Joining game session", skin)).width(250).row();
                 return super.touchDown(event, x, y, pointer, button);
             }
         });
@@ -63,7 +72,14 @@ public class InitialScreen implements Screen {
         this.createButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                connectToServer();
+                try {
+                    connectToServer();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    menuLayout.clear();
+                    menuLayout.add(new Label("Server connection failed. Try again.", skin)).width(250).row();
+                    return super.touchDown(event, x, y, pointer, button);
+                }
                 client.sendTCP(new CreateSessionClientEvent(sessionPassword.getText()));
                 return super.touchDown(event, x, y, pointer, button);
             }
@@ -86,14 +102,10 @@ public class InitialScreen implements Screen {
         this.stage.addActor(this.menuLayout);
     }
 
-    private void connectToServer() {
+    private void connectToServer() throws IOException {
         Network.register(client);
-        try {
-            client.start();
-            client.connect(15000, host.getText(), Integer.parseInt(port.getText()), Integer.parseInt(port.getText()));
-        } catch (Exception e) {
-            System.exit(1);
-        }
+        client.start();
+        client.connect(15000, host.getText(), Integer.parseInt(port.getText()), Integer.parseInt(port.getText()));
     }
 
     @Override

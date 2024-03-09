@@ -2,8 +2,11 @@ package com.github.dennispronin.libdgxpong.multiplayer.example.client.events;
 
 public class JoinSessionClientEvent {
 
-    private final String sessionPassword;
-    private final String sessionId;
+    private String sessionPassword;
+    private String sessionId;
+
+    public JoinSessionClientEvent() {
+    }
 
     public JoinSessionClientEvent(String sessionPassword, String sessionId) {
         this.sessionPassword = sessionPassword;

@@ -4,12 +4,15 @@ import com.github.dennispronin.libdgxpong.multiplayer.example.client.PlayerSide;
 
 public class StartRoundServerEvent {
 
-    private final String sessionId;
-    private final int leftPlayerScore;
-    private final int rightPlayerScore;
-    private final float ballInitialX;
-    private final float ballInitialY;
+    private String sessionId;
+    private int leftPlayerScore;
+    private int rightPlayerScore;
+    private float ballInitialX;
+    private float ballInitialY;
     private PlayerSide playerSide;
+
+    public StartRoundServerEvent() {
+    }
 
     public StartRoundServerEvent(String sessionId, int leftPlayerScore, int rightPlayerScore, float ballInitialX, float ballInitialY) {
         this.sessionId = sessionId;
