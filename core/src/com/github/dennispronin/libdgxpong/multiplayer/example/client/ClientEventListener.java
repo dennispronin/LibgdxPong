@@ -9,7 +9,7 @@ import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.Crea
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.MoveRectangleServerEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.StartRoundServerEvent;
 
-public class EventListener extends Listener {
+public class ClientEventListener extends Listener {
 
     @Override
     public void received(Connection connection, final Object object) {
@@ -35,27 +35,27 @@ public class EventListener extends Listener {
         int rightPlayerScore = startRoundServerEvent.getRightPlayerScore();
         float ballInitialX = startRoundServerEvent.getBallInitialX();
         float ballInitialY = startRoundServerEvent.getBallInitialY();
-//            Gdx.app.postRunnable(() -> {
-        PongGame pongGame = ((PongGame) Gdx.app.getApplicationListener());
-        if (pongGame.getScreen().getClass() != GameScreen.class) {
-            pongGame.setScreen(new GameScreen(
-                    leftPlayerScore,
-                    rightPlayerScore,
-                    ballInitialX,
-                    ballInitialY,
-                    startRoundServerEvent.getPlayerSide(),
-                    connection,
-                    startRoundServerEvent.getSessionId()
-            ));
-        } else {
-            GameScreen gameScreen = (GameScreen) pongGame.getScreen();
-            gameScreen.setLeftPlayerScore(leftPlayerScore);
-            gameScreen.setRightPlayerScore(rightPlayerScore);
-            gameScreen.setBallInitialX(ballInitialX);
-            gameScreen.setBallInitialY(ballInitialY);
-            gameScreen.resetBall();
-        }
-//            });
+        Gdx.app.postRunnable(() -> {
+            PongGame pongGame = ((PongGame) Gdx.app.getApplicationListener());
+            if (pongGame.getScreen().getClass() != GameScreen.class) {
+                pongGame.setScreen(new GameScreen(
+                        leftPlayerScore,
+                        rightPlayerScore,
+                        ballInitialX,
+                        ballInitialY,
+                        startRoundServerEvent.getPlayerSide(),
+                        connection,
+                        startRoundServerEvent.getSessionId()
+                ));
+            } else {
+                GameScreen gameScreen = (GameScreen) pongGame.getScreen();
+                gameScreen.setLeftPlayerScore(leftPlayerScore);
+                gameScreen.setRightPlayerScore(rightPlayerScore);
+                gameScreen.setBallInitialX(ballInitialX);
+                gameScreen.setBallInitialY(ballInitialY);
+                gameScreen.resetBall();
+            }
+        });
     }
 
     private void handleMoveRectangleEvent(MoveRectangleServerEvent moveRectangleServerEvent) {

@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.esotericsoftware.kryonet.Client;
 import com.github.dennispronin.libdgxpong.Network;
-import com.github.dennispronin.libdgxpong.multiplayer.example.client.EventListener;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.ClientEventListener;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.CreateSessionClientEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.JoinSessionClientEvent;
 
@@ -39,7 +39,7 @@ public class InitialScreen implements Screen {
         OrthographicCamera camera = new OrthographicCamera();
         camera.setToOrtho(false, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        client.addListener(new EventListener());
+        client.addListener(new ClientEventListener());
 
         addConnectButtonListener();
         addCreateButtonListener();
