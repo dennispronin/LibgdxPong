@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.esotericsoftware.kryonet.Connection;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.PlayerSide;
+import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.MoveRectangleEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.ScoreEvent;
 
 import static com.github.dennispronin.libdgxpong.Constants.*;
@@ -125,6 +126,14 @@ public class GameScreen implements Screen {
         }
     }
 
+    public void moveOtherPlayer(float y) {
+        if (playerSide == PlayerSide.LEFT) {
+            rightRectangle.y = y;
+        } else {
+            leftRectangle.y = y;
+        }
+    }
+
     /**
      * Player sends event to server about hitting other player
      * Player does not send event about getting hit by other player
@@ -227,6 +236,7 @@ public class GameScreen implements Screen {
             if (Gdx.input.isKeyPressed(Input.Keys.W)) leftRectangle.y += RECTANGLE_SPEED;
             if (leftRectangle.y < 0) leftRectangle.y = 0;
             if (leftRectangle.y > WINDOW_HEIGHT - RECTANGLE_HEIGHT) leftRectangle.y = WINDOW_HEIGHT - RECTANGLE_HEIGHT;
+            connection.sendTCP(new MoveRectangleEvent(sessionId, leftRectangle.y));
         }
         if (playerSide == PlayerSide.RIGHT) {
             if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) rightRectangle.y -= RECTANGLE_SPEED;
@@ -234,6 +244,7 @@ public class GameScreen implements Screen {
             if (rightRectangle.y < 0) rightRectangle.y = 0;
             if (rightRectangle.y > WINDOW_HEIGHT - RECTANGLE_HEIGHT)
                 rightRectangle.y = WINDOW_HEIGHT - RECTANGLE_HEIGHT;
+            connection.sendTCP(new MoveRectangleEvent(sessionId, rightRectangle.y));
         }
     }
 

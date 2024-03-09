@@ -7,8 +7,10 @@ import com.github.dennispronin.libdgxpong.Network;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.PlayerSide;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.CreateRequest;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.JoinRequest;
+import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.MoveRectangleEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.ScoreEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.response.CreateResponse;
+import com.github.dennispronin.libdgxpong.multiplayer.example.server.response.OtherPlayersMoveRectangleEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.response.StartRoundEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.state.GameSession;
 
@@ -97,6 +99,15 @@ public class PongServer {
                     );
                     session.getHostPlayer().sendTCP(startRoundEvent);
                     session.getGuestPlayer().sendTCP(startRoundEvent);
+                }
+                if (object instanceof MoveRectangleEvent) {
+                    MoveRectangleEvent moveRectangleEvent = (MoveRectangleEvent) object;
+                    GameSession session = gameSessions.get(moveRectangleEvent.getSessionId());
+                    if (session.getHostPlayer() == connection) {
+                        session.getGuestPlayer().sendTCP(new OtherPlayersMoveRectangleEvent(moveRectangleEvent.getRectangleY()));
+                    } else {
+                        session.getHostPlayer().sendTCP(new OtherPlayersMoveRectangleEvent(moveRectangleEvent.getRectangleY()));
+                    }
                 }
                 super.received(connection, object);
             }
