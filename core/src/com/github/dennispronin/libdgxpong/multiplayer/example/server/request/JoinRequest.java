@@ -2,19 +2,19 @@ package com.github.dennispronin.libdgxpong.multiplayer.example.server.request;
 
 public class JoinRequest {
 
-    private String playerName;
-    private String sessionPassword;
+    private final String sessionPassword;
+    private final String sessionId;
 
-    public JoinRequest(String playerName, String sessionPassword) {
-        this.playerName = playerName;
+    public JoinRequest(String sessionPassword, String sessionId) {
         this.sessionPassword = sessionPassword;
-    }
-
-    public String getPlayerName() {
-        return playerName;
+        this.sessionId = sessionId;
     }
 
     public String getSessionPassword() {
         return sessionPassword;
+    }
+
+    public String getSessionId() {
+        return sessionId;
     }
 }

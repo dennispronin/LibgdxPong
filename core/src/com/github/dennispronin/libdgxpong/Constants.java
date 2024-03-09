@@ -2,9 +2,6 @@ package com.github.dennispronin.libdgxpong;
 
 public class Constants {
 
-    public static final String SERVER_HOST = "92.118.114.29";
-    public static final int SERVER_PORT = 54555;
-
     public static final float WINDOW_HEIGHT = 480;
     public static final float WINDOW_WIDTH = 800;
 

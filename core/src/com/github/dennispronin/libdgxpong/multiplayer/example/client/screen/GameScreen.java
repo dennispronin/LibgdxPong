@@ -1,8 +1,8 @@
-package com.github.dennispronin.libdgxpong;
+package com.github.dennispronin.libdgxpong.multiplayer.example.client.screen;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -12,43 +12,38 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-import java.util.Random;
-
 import static com.github.dennispronin.libdgxpong.Constants.*;
 
-public class LibgdxPong extends ApplicationAdapter {
+public class GameScreen implements Screen {
 
+    private final Rectangle ball;
     private float ballSpeed = INITIAL_BALL_SPEED;
     private float ballNextX;
     private float ballNextY;
-    private final Random random = new Random();
+    private final Sound ballSound;
+    private float ballInitialX;
+    private float ballInitialY;
 
-    private OrthographicCamera camera;
-    private SpriteBatch spriteBatch;
+    private final Rectangle leftRectangle;
+    private final Rectangle rightRectangle;
+    private int leftPlayerScore;
+    private int rightPlayerScore;
 
-    private BitmapFont font;
+    private final OrthographicCamera camera;
+    private final SpriteBatch spriteBatch;
 
-    private Texture ballImage;
-    private Texture rectangleImage;
-    private Sound ballSound;
+    private final BitmapFont font;
+    private final Texture ballImage;
+    private final Texture rectangleImage;
+    private final Rectangle centerLine;
 
-    private Rectangle ball;
-    private Rectangle leftRectangle;
-    private Rectangle rightRectangle;
-    private Rectangle centerLine;
-
-    private int player1Score = 0;
-    /**
-     * For some reason the ball's initial x is 0, even though I set it in the create()
-     * It leads to scoreHit() being triggered and player2Score being incremented
-     */
-    private int player2Score = -1;
-
-    @Override
-    public void create() {
+    public GameScreen(int leftPlayerScore, int rightPlayerScore, float ballInitialX , float ballInitialY ) {
+        this.leftPlayerScore = leftPlayerScore;
+        this.rightPlayerScore = rightPlayerScore;
+        this.ballInitialX = ballInitialX;
+        this.ballInitialY = ballInitialY;
         ballImage = new Texture(Gdx.files.internal("ball.png"));
         rectangleImage = new Texture(Gdx.files.internal("rectangle.png"));
-        ballSound = Gdx.audio.newSound(Gdx.files.internal("ball.wav"));
         camera = new OrthographicCamera();
         camera.setToOrtho(false, WINDOW_WIDTH, WINDOW_HEIGHT);
         spriteBatch = new SpriteBatch();
@@ -78,10 +73,11 @@ public class LibgdxPong extends ApplicationAdapter {
         ball.height = 40f;
         ball.y = WINDOW_HEIGHT / 2 - ball.width / 2;
         ball.x = WINDOW_WIDTH / 2 - ball.width / 2;
+        ballSound = Gdx.audio.newSound(Gdx.files.internal("ball.wav"));
     }
 
     @Override
-    public void render() {
+    public void render(float delta) {
         ScreenUtils.clear(Color.BLACK);
         camera.update();
         drawObjects();
@@ -94,8 +90,8 @@ public class LibgdxPong extends ApplicationAdapter {
         spriteBatch.begin();
         spriteBatch.draw(ballImage, ball.x, ball.y, ball.width, ball.width);
 
-        font.draw(spriteBatch, String.valueOf(player1Score), WINDOW_WIDTH / 2 - 20, WINDOW_HEIGHT - 20);
-        font.draw(spriteBatch, String.valueOf(player2Score), WINDOW_WIDTH / 2 + 8, WINDOW_HEIGHT - 20);
+        font.draw(spriteBatch, String.valueOf(leftPlayerScore), WINDOW_WIDTH / 2 - 20, WINDOW_HEIGHT - 20);
+        font.draw(spriteBatch, String.valueOf(rightPlayerScore), WINDOW_WIDTH / 2 + 8, WINDOW_HEIGHT - 20);
 
         spriteBatch.draw(rectangleImage, leftRectangle.x, leftRectangle.y, RECTANGLE_WIDTH, RECTANGLE_HEIGHT);
         spriteBatch.draw(rectangleImage, rightRectangle.x, rightRectangle.y, RECTANGLE_WIDTH, RECTANGLE_HEIGHT);
@@ -103,24 +99,13 @@ public class LibgdxPong extends ApplicationAdapter {
         spriteBatch.end();
     }
 
-    private void handleKeyPressed() {
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) leftRectangle.y -= RECTANGLE_SPEED;
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) leftRectangle.y += RECTANGLE_SPEED;
-        if (leftRectangle.y < 0) leftRectangle.y = 0;
-        if (leftRectangle.y > WINDOW_HEIGHT - RECTANGLE_HEIGHT) leftRectangle.y = WINDOW_HEIGHT - RECTANGLE_HEIGHT;
-
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) rightRectangle.y -= RECTANGLE_SPEED;
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) rightRectangle.y += RECTANGLE_SPEED;
-        if (rightRectangle.y < 0) rightRectangle.y = 0;
-        if (rightRectangle.y > WINDOW_HEIGHT - RECTANGLE_HEIGHT) rightRectangle.y = WINDOW_HEIGHT - RECTANGLE_HEIGHT;
-    }
-
-    private void handleBall() {
+    public void handleBall() {
         double vectorX = ballNextX - ball.x;
         double vectorY = ballNextY - ball.y;
         ball.x = ballNextX;
         ball.y = ballNextY;
         if (isRectangleHit()) {
+            ballSound.play();
             deflectBallOfRectangle();
             increaseBallSpeed();
         } else if (isScoreHit()) {
@@ -173,7 +158,6 @@ public class LibgdxPong extends ApplicationAdapter {
     }
 
     private void deflectBallOfRectangle() {
-        ballSound.play();
         if (Intersector.overlaps(ball, leftRectangle)) {
             ballNextX += ballSpeed;
             calculateRectangleHitYDirection(ball.y, leftRectangle.y);
@@ -208,13 +192,12 @@ public class LibgdxPong extends ApplicationAdapter {
     }
 
     private void defineBallInitialDirection() {
-        random.nextInt(2);
-        if (random.nextInt(2) == 0) {
+        if (ballInitialX == 0) {
             this.ballNextX = ball.x + ballSpeed;
         } else {
             this.ballNextX = ball.x - ballSpeed;
         }
-        if (random.nextInt(2) == 0) {
+        if (ballInitialY == 0) {
             this.ballNextY = ball.y + ballSpeed;
         } else {
             this.ballNextY = ball.y - ballSpeed;
@@ -227,12 +210,64 @@ public class LibgdxPong extends ApplicationAdapter {
         }
     }
 
+    private void handleKeyPressed() {
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) leftRectangle.y -= RECTANGLE_SPEED;
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) leftRectangle.y += RECTANGLE_SPEED;
+        if (leftRectangle.y < 0) leftRectangle.y = 0;
+        if (leftRectangle.y > WINDOW_HEIGHT - RECTANGLE_HEIGHT) leftRectangle.y = WINDOW_HEIGHT - RECTANGLE_HEIGHT;
+
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) rightRectangle.y -= RECTANGLE_SPEED;
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) rightRectangle.y += RECTANGLE_SPEED;
+        if (rightRectangle.y < 0) rightRectangle.y = 0;
+        if (rightRectangle.y > WINDOW_HEIGHT - RECTANGLE_HEIGHT) rightRectangle.y = WINDOW_HEIGHT - RECTANGLE_HEIGHT;
+    }
+
+    @Override
+    public void show() {
+
+    }
+
+    @Override
+    public void resize(int width, int height) {
+
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
     @Override
     public void dispose() {
         font.dispose();
         ballImage.dispose();
         rectangleImage.dispose();
-        ballSound.dispose();
         spriteBatch.dispose();
+    }
+
+    public void setLeftPlayerScore(int leftPlayerScore) {
+        this.leftPlayerScore = leftPlayerScore;
+    }
+
+    public void setRightPlayerScore(int rightPlayerScore) {
+        this.rightPlayerScore = rightPlayerScore;
+    }
+
+    public void setBallInitialX(float ballInitialX) {
+        this.ballInitialX = ballInitialX;
+    }
+
+    public void setBallInitialY(float ballInitialY) {
+        this.ballInitialY = ballInitialY;
     }
 }

@@ -5,18 +5,18 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.esotericsoftware.kryonet.Client;
 import com.github.dennispronin.libdgxpong.Network;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.PongGame;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.EventListener;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.CreateRequest;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.JoinRequest;
 
 import static com.github.dennispronin.libdgxpong.Constants.*;
+import static com.github.dennispronin.libdgxpong.Network.SERVER_HOST;
+import static com.github.dennispronin.libdgxpong.Network.SERVER_PORT;
 
 public class InitialScreen implements Screen {
 
@@ -28,7 +28,7 @@ public class InitialScreen implements Screen {
     private final Table menuLayout = new Table();
     private final TextField host = new TextField(SERVER_HOST, skin);
     private final TextField port = new TextField(String.valueOf(SERVER_PORT), skin);
-    private final TextField playerName = new TextField("Enter your name", skin);
+    private final TextField sessionId = new TextField("Enter session Id (if connecting)", skin);
     private final TextField sessionPassword = new TextField("Enter session password", skin);
     private final TextButton joinButton = new TextButton("Join session", skin);
     private final TextButton createButton = new TextButton("Create session", skin);
@@ -39,6 +39,9 @@ public class InitialScreen implements Screen {
 
         OrthographicCamera camera = new OrthographicCamera();
         camera.setToOrtho(false, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+        client.addListener(new EventListener());
+//        client.addListener(new EventListener());
 
         addConnectButtonListener();
         addCreateButtonListener();
@@ -52,14 +55,19 @@ public class InitialScreen implements Screen {
                 // TODO добавить листенеров а ля client.addListener(new ConnectionStateListener());
                 //  Когда от сервера придет ивент StartGame, сменить экран на pongGame.setScreen(new GameScreen(game));
                 //        и каким-то макаром вызвать dispose(); этого экрана
-                // TODO player controls right paddle in this case
+                // TODO playerConnection controls right paddle in this case
                 connectToServer();
-                client.sendTCP(new JoinRequest(playerName.getText(), sessionPassword.getText()));
+                client.sendTCP(new JoinRequest(sessionPassword.getText(), sessionId.getText()));
+                // fixme если такой сессии нет, то нужно это обрабатывать каким-то листенером
+                //  надо в лейбеле заменять надпись на то, что такой сессии нет
+                menuLayout.clear();
+                menuLayout.add(new Label("Joining game session", skin)).width(250).row();
                 return super.touchDown(event, x, y, pointer, button);
             }
         });
     }
 
+    // fixme должен быть хэндлер на получение CreateResponse, который будет отобразит айди сессии (на этом экране ?)
     private void addCreateButtonListener() {
         this.createButton.addListener(new ClickListener() {
             @Override
@@ -67,26 +75,30 @@ public class InitialScreen implements Screen {
                 // TODO добавить листенеров а ля client.addListener(new ConnectionStateListener());
                 //  Когда от сервера придет ивент StartGame, сменить экран на pongGame.setScreen(new GameScreen(game));
                 //        и каким-то макаром вызвать dispose(); этого экрана
-                // TODO player controls left paddle in this case
+                // TODO playerConnection controls left paddle in this case
                 connectToServer();
-                client.sendTCP(new CreateRequest(playerName.getText(), sessionPassword.getText()));
+                client.sendTCP(new CreateRequest(sessionPassword.getText()));
+
+                menuLayout.clear();
+                menuLayout.add(new Label("Waiting for another playerConnection", skin)).width(250).row();
+
                 return super.touchDown(event, x, y, pointer, button);
             }
         });
     }
 
-        private void fillLayout() {
+    private void fillLayout() {
         this.menuLayout.clear();
         this.menuLayout.add(this.host).width(250).row();
         this.menuLayout.add(this.port).width(250).padTop(25).row();
-        this.menuLayout.add(this.playerName).width(250).padTop(25).row();
+        this.menuLayout.add(this.sessionId).width(250).padTop(25).row();
         this.menuLayout.add(this.sessionPassword).width(250).padTop(25).row();
         this.menuLayout.add(this.joinButton).size(150, 50).padTop(100).row();
         this.menuLayout.add(this.createButton).size(150, 50).padTop(25).row();
-
         this.stage.addActor(this.menuLayout);
     }
 
+    // fixme add disconnect logic. Return both players to Initial screen with proper information label
     private void connectToServer() {
         Network.register(client);
         try {
