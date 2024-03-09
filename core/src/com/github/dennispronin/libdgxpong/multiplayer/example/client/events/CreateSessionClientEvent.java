@@ -1,10 +1,10 @@
-package com.github.dennispronin.libdgxpong.multiplayer.example.server.request;
+package com.github.dennispronin.libdgxpong.multiplayer.example.client.events;
 
-public class CreateRequest {
+public class CreateSessionClientEvent {
 
     private final String sessionPassword;
 
-    public CreateRequest(String sessionPassword) {
+    public CreateSessionClientEvent(String sessionPassword) {
         this.sessionPassword = sessionPassword;
     }
 

@@ -13,8 +13,8 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.esotericsoftware.kryonet.Connection;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.PlayerSide;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.MoveRectangleEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.ScoreEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.MoveRectangleClientEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.ScoreHitClientEvent;
 
 import static com.github.dennispronin.libdgxpong.Constants.*;
 
@@ -145,7 +145,7 @@ public class GameScreen implements Screen {
     }
 
     private void sendScoreEvent() {
-        connection.sendTCP(new ScoreEvent(playerSide, sessionId));
+        connection.sendTCP(new ScoreHitClientEvent(playerSide, sessionId));
     }
 
     private void moveBallForward(double vectorX, double vectorY) {
@@ -236,7 +236,7 @@ public class GameScreen implements Screen {
             if (Gdx.input.isKeyPressed(Input.Keys.W)) leftRectangle.y += RECTANGLE_SPEED;
             if (leftRectangle.y < 0) leftRectangle.y = 0;
             if (leftRectangle.y > WINDOW_HEIGHT - RECTANGLE_HEIGHT) leftRectangle.y = WINDOW_HEIGHT - RECTANGLE_HEIGHT;
-            connection.sendTCP(new MoveRectangleEvent(sessionId, leftRectangle.y));
+            connection.sendTCP(new MoveRectangleClientEvent(sessionId, leftRectangle.y));
         }
         if (playerSide == PlayerSide.RIGHT) {
             if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) rightRectangle.y -= RECTANGLE_SPEED;
@@ -244,7 +244,7 @@ public class GameScreen implements Screen {
             if (rightRectangle.y < 0) rightRectangle.y = 0;
             if (rightRectangle.y > WINDOW_HEIGHT - RECTANGLE_HEIGHT)
                 rightRectangle.y = WINDOW_HEIGHT - RECTANGLE_HEIGHT;
-            connection.sendTCP(new MoveRectangleEvent(sessionId, rightRectangle.y));
+            connection.sendTCP(new MoveRectangleClientEvent(sessionId, rightRectangle.y));
         }
     }
 

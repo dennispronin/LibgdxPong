@@ -2,8 +2,8 @@ package com.github.dennispronin.libdgxpong;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.CreateRequest;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.JoinRequest;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.CreateSessionClientEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.JoinSessionClientEvent;
 
 public class Network {
 
@@ -12,7 +12,7 @@ public class Network {
 
     public static void register(EndPoint endPoint) {
         Kryo kryo = endPoint.getKryo();
-        kryo.register(CreateRequest.class);
-        kryo.register(JoinRequest.class);
+        kryo.register(CreateSessionClientEvent.class);
+        kryo.register(JoinSessionClientEvent.class);
     }
 }

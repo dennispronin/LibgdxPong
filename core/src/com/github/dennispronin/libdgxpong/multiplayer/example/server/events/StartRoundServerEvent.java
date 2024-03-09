@@ -1,8 +1,8 @@
-package com.github.dennispronin.libdgxpong.multiplayer.example.server.response;
+package com.github.dennispronin.libdgxpong.multiplayer.example.server.events;
 
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.PlayerSide;
 
-public class StartRoundEvent {
+public class StartRoundServerEvent {
 
     private final String sessionId;
     private final int leftPlayerScore;
@@ -11,7 +11,7 @@ public class StartRoundEvent {
     private final float ballInitialY;
     private PlayerSide playerSide;
 
-    public StartRoundEvent(String sessionId, int leftPlayerScore, int rightPlayerScore, float ballInitialX, float ballInitialY) {
+    public StartRoundServerEvent(String sessionId, int leftPlayerScore, int rightPlayerScore, float ballInitialX, float ballInitialY) {
         this.sessionId = sessionId;
         this.leftPlayerScore = leftPlayerScore;
         this.rightPlayerScore = rightPlayerScore;

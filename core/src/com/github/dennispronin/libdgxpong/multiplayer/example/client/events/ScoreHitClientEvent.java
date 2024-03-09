@@ -1,13 +1,13 @@
-package com.github.dennispronin.libdgxpong.multiplayer.example.server.request;
+package com.github.dennispronin.libdgxpong.multiplayer.example.client.events;
 
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.PlayerSide;
 
-public class ScoreEvent {
+public class ScoreHitClientEvent {
 
     private final PlayerSide playerSide;
     private final String sessionId;
 
-    public ScoreEvent(PlayerSide playerSide, String sessionId) {
+    public ScoreHitClientEvent(PlayerSide playerSide, String sessionId) {
         this.playerSide = playerSide;
         this.sessionId = sessionId;
     }

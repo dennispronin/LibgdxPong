@@ -5,13 +5,13 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.github.dennispronin.libdgxpong.Network;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.PlayerSide;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.CreateRequest;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.JoinRequest;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.MoveRectangleEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.ScoreEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.response.CreateResponse;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.response.OtherPlayersMoveRectangleEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.response.StartRoundEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.CreateSessionClientEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.JoinSessionClientEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.MoveRectangleClientEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.ScoreHitClientEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.CreateSessionServerEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.MoveRectangleServerEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.StartRoundServerEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.state.GameSession;
 
 import java.io.IOException;
@@ -34,85 +34,96 @@ public class PongServer {
     public PongServer() throws IOException {
         Server server = new Server();
         Network.register(server);
-
         server.addListener(new Listener() {
             @Override
             public void received(Connection connection, Object object) {
-                if (object instanceof JoinRequest) {
-                    JoinRequest joinRequest = (JoinRequest) object;
-                    GameSession session = gameSessions.get(joinRequest.getSessionId());
-                    if (session == null) {
-                        return;
-                    }
-                    if (session.getGuestPlayer() != null) {
-                        return;
-                    }
-                    if (!session.getSessionPassword().equals(joinRequest.getSessionPassword())) {
-                        return;
-                    }
-                    session.setGuestPlayer(connection);
-                    float ballNextX = random.nextInt(2);
-                    float ballNextY = random.nextInt(2);
-                    StartRoundEvent startRoundEvent = new StartRoundEvent(
-                            session.getSessionId(),
-                            session.getLeftPlayerScore(),
-                            session.getRightPlayerScore(),
-                            ballNextX,
-                            ballNextY
-                    );
-
-                    startRoundEvent.setPlayerSide(PlayerSide.LEFT);
-                    session.getHostPlayer().sendTCP(startRoundEvent);
-                    startRoundEvent.setPlayerSide(PlayerSide.RIGHT);
-                    session.getGuestPlayer().sendTCP(startRoundEvent);
+                if (object instanceof JoinSessionClientEvent) {
+                    handleJoinSessionEvent((JoinSessionClientEvent) object, connection);
                 }
-                if (object instanceof CreateRequest) {
-                    CreateRequest createRequest = (CreateRequest) object;
-                    if (createRequest.getSessionPassword() == null) {
-                        return;
-                    }
-                    GameSession session = new GameSession();
-                    String sessionId = UUID.randomUUID().toString();
-                    while (gameSessions.containsKey(sessionId)) {
-                        sessionId = UUID.randomUUID().toString();
-                    }
-                    session.setSessionId(sessionId);
-                    session.setSessionPassword(createRequest.getSessionPassword());
-                    session.setHostPlayer(connection);
-
-                    gameSessions.put(sessionId, session);
-                    CreateResponse createResponse = new CreateResponse(sessionId);
-                    connection.sendTCP(createResponse);
+                if (object instanceof CreateSessionClientEvent) {
+                    handleCreateSessionClientEvent((CreateSessionClientEvent) object, connection);
                 }
-                if (object instanceof ScoreEvent) {
-                    ScoreEvent scoreEvent = (ScoreEvent) object;
-                    GameSession session = gameSessions.get(scoreEvent.getSessionId());
-                    session.incrementScore(scoreEvent.getPlayerSide());
-                    float ballNextX = random.nextInt(2);
-                    float ballNextY = random.nextInt(2);
-                    StartRoundEvent startRoundEvent = new StartRoundEvent(
-                            session.getSessionId(),
-                            session.getLeftPlayerScore(),
-                            session.getRightPlayerScore(),
-                            ballNextX,
-                            ballNextY
-                    );
-                    session.getHostPlayer().sendTCP(startRoundEvent);
-                    session.getGuestPlayer().sendTCP(startRoundEvent);
+                if (object instanceof ScoreHitClientEvent) {
+                    handleScoreHitClientEvent((ScoreHitClientEvent) object);
                 }
-                if (object instanceof MoveRectangleEvent) {
-                    MoveRectangleEvent moveRectangleEvent = (MoveRectangleEvent) object;
-                    GameSession session = gameSessions.get(moveRectangleEvent.getSessionId());
-                    if (session.getHostPlayer() == connection) {
-                        session.getGuestPlayer().sendTCP(new OtherPlayersMoveRectangleEvent(moveRectangleEvent.getRectangleY()));
-                    } else {
-                        session.getHostPlayer().sendTCP(new OtherPlayersMoveRectangleEvent(moveRectangleEvent.getRectangleY()));
-                    }
+                if (object instanceof MoveRectangleClientEvent) {
+                    handleMoveRectangleClientEvent((MoveRectangleClientEvent) object, connection);
                 }
                 super.received(connection, object);
             }
         });
         server.bind(SERVER_PORT);
         server.start();
+    }
+
+    private void handleMoveRectangleClientEvent(MoveRectangleClientEvent moveRectangleClientEvent, Connection connection) {
+        GameSession session = gameSessions.get(moveRectangleClientEvent.getSessionId());
+        if (session.getHostPlayer() == connection) {
+            session.getGuestPlayer().sendTCP(new MoveRectangleServerEvent(moveRectangleClientEvent.getRectangleY()));
+        } else {
+            session.getHostPlayer().sendTCP(new MoveRectangleServerEvent(moveRectangleClientEvent.getRectangleY()));
+        }
+    }
+
+    private void handleScoreHitClientEvent(ScoreHitClientEvent scoreHitClientEvent) {
+        GameSession session = gameSessions.get(scoreHitClientEvent.getSessionId());
+        session.incrementScore(scoreHitClientEvent.getPlayerSide());
+        float ballNextX = random.nextInt(2);
+        float ballNextY = random.nextInt(2);
+        StartRoundServerEvent startRoundServerEvent = new StartRoundServerEvent(
+                session.getSessionId(),
+                session.getLeftPlayerScore(),
+                session.getRightPlayerScore(),
+                ballNextX,
+                ballNextY
+        );
+        session.getHostPlayer().sendTCP(startRoundServerEvent);
+        session.getGuestPlayer().sendTCP(startRoundServerEvent);
+    }
+
+    private void handleCreateSessionClientEvent(CreateSessionClientEvent createSessionClientEvent, Connection connection) {
+        if (createSessionClientEvent.getSessionPassword() == null) {
+            return;
+        }
+        GameSession session = new GameSession();
+        String sessionId = UUID.randomUUID().toString();
+        while (gameSessions.containsKey(sessionId)) {
+            sessionId = UUID.randomUUID().toString();
+        }
+        session.setSessionId(sessionId);
+        session.setSessionPassword(createSessionClientEvent.getSessionPassword());
+        session.setHostPlayer(connection);
+
+        gameSessions.put(sessionId, session);
+        CreateSessionServerEvent createResponse = new CreateSessionServerEvent(sessionId);
+        connection.sendTCP(createResponse);
+    }
+
+    private void handleJoinSessionEvent(JoinSessionClientEvent joinSessionClientEvent, Connection connection) {
+        GameSession session = gameSessions.get(joinSessionClientEvent.getSessionId());
+        if (session == null) {
+            return;
+        }
+        if (session.getGuestPlayer() != null) {
+            return;
+        }
+        if (!session.getSessionPassword().equals(joinSessionClientEvent.getSessionPassword())) {
+            return;
+        }
+        session.setGuestPlayer(connection);
+        float ballNextX = random.nextInt(2);
+        float ballNextY = random.nextInt(2);
+        StartRoundServerEvent startRoundServerEvent = new StartRoundServerEvent(
+                session.getSessionId(),
+                session.getLeftPlayerScore(),
+                session.getRightPlayerScore(),
+                ballNextX,
+                ballNextY
+        );
+
+        startRoundServerEvent.setPlayerSide(PlayerSide.LEFT);
+        session.getHostPlayer().sendTCP(startRoundServerEvent);
+        startRoundServerEvent.setPlayerSide(PlayerSide.RIGHT);
+        session.getGuestPlayer().sendTCP(startRoundServerEvent);
     }
 }

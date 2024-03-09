@@ -11,8 +11,8 @@ import com.esotericsoftware.kryonet.Client;
 import com.github.dennispronin.libdgxpong.Network;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.PongGame;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.EventListener;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.CreateRequest;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.JoinRequest;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.CreateSessionClientEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.JoinSessionClientEvent;
 
 import static com.github.dennispronin.libdgxpong.Constants.*;
 import static com.github.dennispronin.libdgxpong.Network.SERVER_HOST;
@@ -52,7 +52,7 @@ public class InitialScreen implements Screen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 connectToServer();
-                client.sendTCP(new JoinRequest(sessionPassword.getText(), sessionId.getText()));
+                client.sendTCP(new JoinSessionClientEvent(sessionPassword.getText(), sessionId.getText()));
                 // fixme если такой сессии нет, то нужно это обрабатывать каким-то листенером
                 //  надо в лейбеле заменять надпись на то, что такой сессии нет
                 menuLayout.clear();
@@ -62,13 +62,13 @@ public class InitialScreen implements Screen {
         });
     }
 
-    // fixme должен быть хэндлер на получение CreateResponse, который будет отобразит айди сессии (на этом экране ?)
+    // fixme должен быть хэндлер на получение CreateSessionServerEvent, который будет отобразит айди сессии (на этом экране ?)
     private void addCreateButtonListener() {
         this.createButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 connectToServer();
-                client.sendTCP(new CreateRequest(sessionPassword.getText()));
+                client.sendTCP(new CreateSessionClientEvent(sessionPassword.getText()));
                 menuLayout.clear();
                 menuLayout.add(new Label("Waiting for another playerConnection", skin)).width(250).row();
                 return super.touchDown(event, x, y, pointer, button);
