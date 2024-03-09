@@ -4,8 +4,7 @@ public class CreateSessionServerEvent {
 
     private String sessionId;
 
-    public CreateSessionServerEvent() {
-    }
+    public CreateSessionServerEvent() {}
 
     public CreateSessionServerEvent(String sessionId) {
         this.sessionId = sessionId;

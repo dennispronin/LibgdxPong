@@ -11,8 +11,7 @@ public class StartRoundServerEvent {
     private float ballInitialY;
     private PlayerSide playerSide;
 
-    public StartRoundServerEvent() {
-    }
+    public StartRoundServerEvent() {}
 
     public StartRoundServerEvent(String sessionId, int leftPlayerScore, int rightPlayerScore, float ballInitialX, float ballInitialY) {
         this.sessionId = sessionId;

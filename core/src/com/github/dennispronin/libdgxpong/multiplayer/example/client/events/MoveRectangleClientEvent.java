@@ -5,8 +5,7 @@ public class MoveRectangleClientEvent {
     private String sessionId;
     private float rectangleY;
 
-    public MoveRectangleClientEvent() {
-    }
+    public MoveRectangleClientEvent() {}
 
     public MoveRectangleClientEvent(String sessionId, float rectangleY) {
         this.sessionId = sessionId;

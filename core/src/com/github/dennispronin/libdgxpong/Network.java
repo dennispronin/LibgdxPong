@@ -9,6 +9,7 @@ import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.Move
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.ScoreHitClientEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.CreateSessionServerEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.MoveRectangleServerEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.PlayerDisconnectedServerEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.StartRoundServerEvent;
 
 public class Network {
@@ -26,6 +27,7 @@ public class Network {
         kryo.register(CreateSessionServerEvent.class);
         kryo.register(MoveRectangleServerEvent.class);
         kryo.register(StartRoundServerEvent.class);
+        kryo.register(PlayerDisconnectedServerEvent.class);
         kryo.register(PlayerSide.class);
     }
 }

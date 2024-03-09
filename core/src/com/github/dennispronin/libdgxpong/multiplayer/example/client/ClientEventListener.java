@@ -7,6 +7,7 @@ import com.github.dennispronin.libdgxpong.multiplayer.example.client.screen.Game
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.screen.InitialScreen;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.CreateSessionServerEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.MoveRectangleServerEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.PlayerDisconnectedServerEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.StartRoundServerEvent;
 
 public class ClientEventListener extends Listener {
@@ -21,6 +22,9 @@ public class ClientEventListener extends Listener {
         }
         if (object instanceof MoveRectangleServerEvent) {
             handleMoveRectangleEvent((MoveRectangleServerEvent) object);
+        }
+        if (object instanceof PlayerDisconnectedServerEvent) {
+            handlePlayerDisconnectedServerEvent();
         }
         super.received(connection, object);
     }
@@ -60,7 +64,17 @@ public class ClientEventListener extends Listener {
 
     private void handleMoveRectangleEvent(MoveRectangleServerEvent moveRectangleServerEvent) {
         PongGame pongGame = ((PongGame) Gdx.app.getApplicationListener());
-        GameScreen gameScreen = (GameScreen) pongGame.getScreen();
-        gameScreen.moveOtherPlayer(moveRectangleServerEvent.getRectangleY());
+        if (pongGame.getScreen().getClass() == GameScreen.class) {
+            GameScreen gameScreen = (GameScreen) pongGame.getScreen();
+            gameScreen.moveOtherPlayer(moveRectangleServerEvent.getRectangleY());
+        }
+    }
+
+    private void handlePlayerDisconnectedServerEvent() {
+        Gdx.app.postRunnable(() -> Gdx.app.postRunnable(() -> {
+            PongGame pongGame = ((PongGame) Gdx.app.getApplicationListener());
+            pongGame.getScreen().dispose();
+            pongGame.setScreen(new InitialScreen());
+        }));
     }
 }

@@ -4,9 +4,7 @@ public class CreateSessionClientEvent {
 
     private String sessionPassword;
 
-    public CreateSessionClientEvent() {
-
-    }
+    public CreateSessionClientEvent() {}
 
     public CreateSessionClientEvent(String sessionPassword) {
         this.sessionPassword = sessionPassword;

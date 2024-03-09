@@ -7,8 +7,7 @@ public class ScoreHitClientEvent {
     private PlayerSide playerSide;
     private String sessionId;
 
-    public ScoreHitClientEvent() {
-    }
+    public ScoreHitClientEvent() {}
 
     public ScoreHitClientEvent(PlayerSide playerSide, String sessionId) {
         this.playerSide = playerSide;

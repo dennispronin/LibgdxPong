@@ -4,8 +4,7 @@ public class MoveRectangleServerEvent {
 
     private float rectangleY;
 
-    public MoveRectangleServerEvent() {
-    }
+    public MoveRectangleServerEvent() {}
 
     public MoveRectangleServerEvent(float rectangleY) {
         this.rectangleY = rectangleY;

@@ -5,8 +5,7 @@ public class JoinSessionClientEvent {
     private String sessionPassword;
     private String sessionId;
 
-    public JoinSessionClientEvent() {
-    }
+    public JoinSessionClientEvent() {}
 
     public JoinSessionClientEvent(String sessionPassword, String sessionId) {
         this.sessionPassword = sessionPassword;
