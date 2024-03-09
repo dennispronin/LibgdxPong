@@ -41,7 +41,6 @@ public class InitialScreen implements Screen {
         camera.setToOrtho(false, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         client.addListener(new EventListener());
-//        client.addListener(new EventListener());
 
         addConnectButtonListener();
         addCreateButtonListener();
@@ -52,16 +51,12 @@ public class InitialScreen implements Screen {
         this.joinButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                // TODO добавить листенеров а ля client.addListener(new ConnectionStateListener());
-                //  Когда от сервера придет ивент StartGame, сменить экран на pongGame.setScreen(new GameScreen(game));
-                //        и каким-то макаром вызвать dispose(); этого экрана
-                // TODO playerConnection controls right paddle in this case
                 connectToServer();
                 client.sendTCP(new JoinRequest(sessionPassword.getText(), sessionId.getText()));
                 // fixme если такой сессии нет, то нужно это обрабатывать каким-то листенером
                 //  надо в лейбеле заменять надпись на то, что такой сессии нет
                 menuLayout.clear();
-                menuLayout.add(new Label("Joining game session", skin)).width(250).row();
+                menuLayout.add(new Label("Joininlg game session", skin)).width(250).row();
                 return super.touchDown(event, x, y, pointer, button);
             }
         });
@@ -72,16 +67,10 @@ public class InitialScreen implements Screen {
         this.createButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                // TODO добавить листенеров а ля client.addListener(new ConnectionStateListener());
-                //  Когда от сервера придет ивент StartGame, сменить экран на pongGame.setScreen(new GameScreen(game));
-                //        и каким-то макаром вызвать dispose(); этого экрана
-                // TODO playerConnection controls left paddle in this case
                 connectToServer();
                 client.sendTCP(new CreateRequest(sessionPassword.getText()));
-
                 menuLayout.clear();
                 menuLayout.add(new Label("Waiting for another playerConnection", skin)).width(250).row();
-
                 return super.touchDown(event, x, y, pointer, button);
             }
         });

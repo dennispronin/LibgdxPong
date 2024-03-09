@@ -1,6 +1,7 @@
 package com.github.dennispronin.libdgxpong.multiplayer.example.server.state;
 
 import com.esotericsoftware.kryonet.Connection;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.PlayerSide;
 
 public class GameSession {
 
@@ -14,6 +15,17 @@ public class GameSession {
      * It leads to scoreHit() being triggered and player2Score being incremented
      */
     private int rightPlayerScore = -1;
+
+    public void incrementScore(PlayerSide playerSide) {
+        switch (playerSide) {
+            case LEFT:
+                leftPlayerScore++;
+                break;
+            case RIGHT:
+                rightPlayerScore++;
+                break;
+        }
+    }
 
     public String getSessionId() {
         return sessionId;

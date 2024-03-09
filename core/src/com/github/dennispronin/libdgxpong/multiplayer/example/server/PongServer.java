@@ -4,8 +4,10 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.github.dennispronin.libdgxpong.Network;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.PlayerSide;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.CreateRequest;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.JoinRequest;
+import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.ScoreEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.response.CreateResponse;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.response.StartRoundEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.state.GameSession;
@@ -50,13 +52,16 @@ public class PongServer {
                     float ballNextX = random.nextInt(2);
                     float ballNextY = random.nextInt(2);
                     StartRoundEvent startRoundEvent = new StartRoundEvent(
+                            session.getSessionId(),
                             session.getLeftPlayerScore(),
                             session.getRightPlayerScore(),
                             ballNextX,
                             ballNextY
                     );
 
+                    startRoundEvent.setPlayerSide(PlayerSide.LEFT);
                     session.getHostPlayer().sendTCP(startRoundEvent);
+                    startRoundEvent.setPlayerSide(PlayerSide.RIGHT);
                     session.getGuestPlayer().sendTCP(startRoundEvent);
                 }
                 if (object instanceof CreateRequest) {
@@ -76,6 +81,22 @@ public class PongServer {
                     gameSessions.put(sessionId, session);
                     CreateResponse createResponse = new CreateResponse(sessionId);
                     connection.sendTCP(createResponse);
+                }
+                if (object instanceof ScoreEvent) {
+                    ScoreEvent scoreEvent = (ScoreEvent) object;
+                    GameSession session = gameSessions.get(scoreEvent.getSessionId());
+                    session.incrementScore(scoreEvent.getPlayerSide());
+                    float ballNextX = random.nextInt(2);
+                    float ballNextY = random.nextInt(2);
+                    StartRoundEvent startRoundEvent = new StartRoundEvent(
+                            session.getSessionId(),
+                            session.getLeftPlayerScore(),
+                            session.getRightPlayerScore(),
+                            ballNextX,
+                            ballNextY
+                    );
+                    session.getHostPlayer().sendTCP(startRoundEvent);
+                    session.getGuestPlayer().sendTCP(startRoundEvent);
                 }
                 super.received(connection, object);
             }

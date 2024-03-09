@@ -11,6 +11,9 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.esotericsoftware.kryonet.Connection;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.PlayerSide;
+import com.github.dennispronin.libdgxpong.multiplayer.example.server.request.ScoreEvent;
 
 import static com.github.dennispronin.libdgxpong.Constants.*;
 
@@ -37,11 +40,18 @@ public class GameScreen implements Screen {
     private final Texture rectangleImage;
     private final Rectangle centerLine;
 
-    public GameScreen(int leftPlayerScore, int rightPlayerScore, float ballInitialX , float ballInitialY ) {
+    private final PlayerSide playerSide;
+    private final Connection connection;
+    private final String sessionId;
+
+    public GameScreen(int leftPlayerScore, int rightPlayerScore, float ballInitialX, float ballInitialY, PlayerSide playerSide, Connection connection, String sessionId) {
         this.leftPlayerScore = leftPlayerScore;
         this.rightPlayerScore = rightPlayerScore;
         this.ballInitialX = ballInitialX;
         this.ballInitialY = ballInitialY;
+        this.playerSide = playerSide;
+        this.connection = connection;
+        this.sessionId = sessionId;
         ballImage = new Texture(Gdx.files.internal("ball.png"));
         rectangleImage = new Texture(Gdx.files.internal("rectangle.png"));
         camera = new OrthographicCamera();
@@ -109,23 +119,24 @@ public class GameScreen implements Screen {
             deflectBallOfRectangle();
             increaseBallSpeed();
         } else if (isScoreHit()) {
-            scoreHit();
-            resetBall();
+            sendScoreEvent();
         } else {
             moveBallForward(vectorX, vectorY);
         }
     }
 
+    /**
+     * Player sends event to server about hitting other player
+     * Player does not send event about getting hit by other player
+     * I've made this logic to avoid duplicate score increments
+     */
     private boolean isScoreHit() {
-        return ball.x <= 0 || ball.x + ball.width >= WINDOW_WIDTH;
+        return (ball.x <= 0 && playerSide == PlayerSide.RIGHT)
+                || (ball.x + ball.width >= WINDOW_WIDTH && playerSide == PlayerSide.LEFT);
     }
 
-    public void scoreHit() {
-        if (ball.x <= 0) {
-            player2Score++;
-        } else if (ball.x + ball.width >= WINDOW_WIDTH) {
-            player1Score++;
-        }
+    private void sendScoreEvent() {
+        connection.sendTCP(new ScoreEvent(playerSide, sessionId));
     }
 
     private void moveBallForward(double vectorX, double vectorY) {
@@ -184,7 +195,7 @@ public class GameScreen implements Screen {
         return Intersector.overlaps(ball, leftRectangle) || Intersector.overlaps(ball, rightRectangle);
     }
 
-    private void resetBall() {
+    public void resetBall() {
         ball.x = WINDOW_WIDTH / 2 - ball.width / 2;
         ball.y = WINDOW_HEIGHT / 2 - ball.width / 2;
         ballSpeed = INITIAL_BALL_SPEED;
@@ -211,15 +222,19 @@ public class GameScreen implements Screen {
     }
 
     private void handleKeyPressed() {
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) leftRectangle.y -= RECTANGLE_SPEED;
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) leftRectangle.y += RECTANGLE_SPEED;
-        if (leftRectangle.y < 0) leftRectangle.y = 0;
-        if (leftRectangle.y > WINDOW_HEIGHT - RECTANGLE_HEIGHT) leftRectangle.y = WINDOW_HEIGHT - RECTANGLE_HEIGHT;
-
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) rightRectangle.y -= RECTANGLE_SPEED;
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) rightRectangle.y += RECTANGLE_SPEED;
-        if (rightRectangle.y < 0) rightRectangle.y = 0;
-        if (rightRectangle.y > WINDOW_HEIGHT - RECTANGLE_HEIGHT) rightRectangle.y = WINDOW_HEIGHT - RECTANGLE_HEIGHT;
+        if (playerSide == PlayerSide.LEFT) {
+            if (Gdx.input.isKeyPressed(Input.Keys.S)) leftRectangle.y -= RECTANGLE_SPEED;
+            if (Gdx.input.isKeyPressed(Input.Keys.W)) leftRectangle.y += RECTANGLE_SPEED;
+            if (leftRectangle.y < 0) leftRectangle.y = 0;
+            if (leftRectangle.y > WINDOW_HEIGHT - RECTANGLE_HEIGHT) leftRectangle.y = WINDOW_HEIGHT - RECTANGLE_HEIGHT;
+        }
+        if (playerSide == PlayerSide.RIGHT) {
+            if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) rightRectangle.y -= RECTANGLE_SPEED;
+            if (Gdx.input.isKeyPressed(Input.Keys.UP)) rightRectangle.y += RECTANGLE_SPEED;
+            if (rightRectangle.y < 0) rightRectangle.y = 0;
+            if (rightRectangle.y > WINDOW_HEIGHT - RECTANGLE_HEIGHT)
+                rightRectangle.y = WINDOW_HEIGHT - RECTANGLE_HEIGHT;
+        }
     }
 
     @Override

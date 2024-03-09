@@ -19,13 +19,22 @@ public class EventListener extends Listener {
             Gdx.app.postRunnable(() -> {
                 PongGame pongGame = ((PongGame) Gdx.app.getApplicationListener());
                 if (pongGame.getScreen().getClass() != GameScreen.class) {
-                    pongGame.setScreen(new GameScreen(leftPlayerScore, rightPlayerScore, ballInitialX, ballInitialY));
+                    pongGame.setScreen(new GameScreen(
+                            leftPlayerScore,
+                            rightPlayerScore,
+                            ballInitialX,
+                            ballInitialY,
+                            startRoundEvent.getPlayerSide(),
+                            connection,
+                            startRoundEvent.getSessionId()
+                            ));
                 } else {
                     GameScreen gameScreen = (GameScreen) pongGame.getScreen();
                     gameScreen.setLeftPlayerScore(leftPlayerScore);
                     gameScreen.setRightPlayerScore(rightPlayerScore);
                     gameScreen.setBallInitialX(ballInitialX);
                     gameScreen.setBallInitialY(ballInitialY);
+                    gameScreen.resetBall();
                 }
             });
         }
