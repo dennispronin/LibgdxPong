@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.esotericsoftware.kryonet.Client;
 import com.github.dennispronin.libdgxpong.Network;
-import com.github.dennispronin.libdgxpong.multiplayer.example.client.PongGame;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.EventListener;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.CreateSessionClientEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.JoinSessionClientEvent;
@@ -20,7 +19,6 @@ import static com.github.dennispronin.libdgxpong.Network.SERVER_PORT;
 
 public class InitialScreen implements Screen {
 
-    private final PongGame pongGame;
     private final Stage stage = new Stage();
     private final Client client = new Client();
 
@@ -33,8 +31,7 @@ public class InitialScreen implements Screen {
     private final TextButton joinButton = new TextButton("Join session", skin);
     private final TextButton createButton = new TextButton("Create session", skin);
 
-    public InitialScreen(PongGame pongGame) {
-        this.pongGame = pongGame;
+    public InitialScreen() {
         this.menuLayout.setBounds(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         OrthographicCamera camera = new OrthographicCamera();
@@ -62,18 +59,20 @@ public class InitialScreen implements Screen {
         });
     }
 
-    // fixme должен быть хэндлер на получение CreateSessionServerEvent, который будет отобразит айди сессии (на этом экране ?)
     private void addCreateButtonListener() {
         this.createButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 connectToServer();
                 client.sendTCP(new CreateSessionClientEvent(sessionPassword.getText()));
-                menuLayout.clear();
-                menuLayout.add(new Label("Waiting for another playerConnection", skin)).width(250).row();
                 return super.touchDown(event, x, y, pointer, button);
             }
         });
+    }
+
+    public void showSessionId(String sessionId) {
+        menuLayout.clear();
+        menuLayout.add(new Label("Waiting for another playerConnection. Session ID = " + sessionId, skin)).width(250).row();
     }
 
     private void fillLayout() {
@@ -87,7 +86,6 @@ public class InitialScreen implements Screen {
         this.stage.addActor(this.menuLayout);
     }
 
-    // fixme add disconnect logic. Return both players to Initial screen with proper information label
     private void connectToServer() {
         Network.register(client);
         try {
@@ -96,7 +94,6 @@ public class InitialScreen implements Screen {
         } catch (Exception e) {
             System.exit(1);
         }
-        pongGame.setClient(client);
     }
 
     @Override

@@ -66,12 +66,4 @@ public class GameSession {
     public void setGuestPlayer(Connection guestPlayerConnection) {
         this.guestPlayerConnection = guestPlayerConnection;
     }
-
-    public void setLeftPlayerScore(int leftPlayerScore) {
-        this.leftPlayerScore = leftPlayerScore;
-    }
-
-    public void setRightPlayerScore(int rightPlayerScore) {
-        this.rightPlayerScore = rightPlayerScore;
-    }
 }

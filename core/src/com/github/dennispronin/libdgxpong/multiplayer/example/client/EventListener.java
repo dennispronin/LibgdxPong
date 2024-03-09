@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.screen.GameScreen;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.screen.InitialScreen;
+import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.CreateSessionServerEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.MoveRectangleServerEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.StartRoundServerEvent;
 
@@ -14,10 +16,18 @@ public class EventListener extends Listener {
         if (object instanceof StartRoundServerEvent) {
             handleStartRoundEvent((StartRoundServerEvent) object, connection);
         }
+        if (object instanceof CreateSessionServerEvent) {
+            handleCreateSessionServerEvent((CreateSessionServerEvent) object);
+        }
         if (object instanceof MoveRectangleServerEvent) {
             handleMoveRectangleEvent((MoveRectangleServerEvent) object);
         }
         super.received(connection, object);
+    }
+
+    private void handleCreateSessionServerEvent(CreateSessionServerEvent createSessionServerEvent) {
+        PongGame pongGame = ((PongGame) Gdx.app.getApplicationListener());
+        ((InitialScreen) pongGame.getScreen()).showSessionId(createSessionServerEvent.getSessionId());
     }
 
     private void handleStartRoundEvent(StartRoundServerEvent startRoundServerEvent, Connection connection) {
