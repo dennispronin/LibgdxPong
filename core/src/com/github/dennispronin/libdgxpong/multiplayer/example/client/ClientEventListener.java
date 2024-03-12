@@ -31,7 +31,9 @@ public class ClientEventListener extends Listener {
 
     private void handleCreateSessionServerEvent(CreateSessionServerEvent createSessionServerEvent) {
         PongGame pongGame = ((PongGame) Gdx.app.getApplicationListener());
-        ((InitialScreen) pongGame.getScreen()).showMessage("Waiting for another playerConnection. Session ID = " + createSessionServerEvent.getSessionId());
+        InitialScreen initialScreen = (InitialScreen) pongGame.getScreen();
+        initialScreen.showMessage("Waiting for another player");
+        initialScreen.setSessionId(createSessionServerEvent.getSessionId());
     }
 
     private void handleStartRoundEvent(StartRoundServerEvent startRoundServerEvent, Connection connection) {

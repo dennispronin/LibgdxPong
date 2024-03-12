@@ -84,7 +84,11 @@ public class InitialScreen implements Screen {
     }
 
     public void showMessage(String message) {
-        informationMessage.setText(message);
+        this.informationMessage.setText(message);
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId.setText(sessionId);
     }
 
     private void fillLayout() {
