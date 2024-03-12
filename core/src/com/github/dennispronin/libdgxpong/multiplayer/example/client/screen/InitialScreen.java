@@ -56,15 +56,11 @@ public class InitialScreen implements Screen {
                     connectToServer();
                 } catch (Exception e) {
                     e.printStackTrace();
-//                    menuLayout.clear();
                     informationMessage.setText("Server connection failed. Try again.");
-//                    menuLayout.add(informationMessage).width(250).row();
                     return super.touchDown(event, x, y, pointer, button);
                 }
                 client.sendTCP(new JoinSessionClientEvent(sessionPassword.getText(), sessionId.getText()));
-//                menuLayout.clear();
                 informationMessage.setText("Joining game session");
-//                menuLayout.add(informationMessage).width(250).row();
                 return super.touchDown(event, x, y, pointer, button);
             }
         });
@@ -78,9 +74,7 @@ public class InitialScreen implements Screen {
                     connectToServer();
                 } catch (Exception e) {
                     e.printStackTrace();
-//                    menuLayout.clear();
                     informationMessage.setText("Server connection failed. Try again.");
-//                    menuLayout.add(informationMessage).width(250).row();
                     return super.touchDown(event, x, y, pointer, button);
                 }
                 client.sendTCP(new CreateSessionClientEvent(sessionPassword.getText()));
@@ -90,9 +84,7 @@ public class InitialScreen implements Screen {
     }
 
     public void showMessage(String message) {
-//        menuLayout.clear();
         informationMessage.setText(message);
-//        menuLayout.add(informationMessage).width(250).row();
     }
 
     private void fillLayout() {
