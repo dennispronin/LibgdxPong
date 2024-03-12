@@ -5,10 +5,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.screen.GameScreen;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.screen.InitialScreen;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.CreateSessionServerEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.MoveRectangleServerEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.PlayerDisconnectedServerEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.StartRoundServerEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.*;
 
 public class ClientEventListener extends Listener {
 
@@ -26,12 +23,15 @@ public class ClientEventListener extends Listener {
         if (object instanceof PlayerDisconnectedServerEvent) {
             handlePlayerDisconnectedServerEvent();
         }
+        if (object instanceof WrongSessionIdServerEvent) {
+            handleWrongSessionIdServerEvent();
+        }
         super.received(connection, object);
     }
 
     private void handleCreateSessionServerEvent(CreateSessionServerEvent createSessionServerEvent) {
         PongGame pongGame = ((PongGame) Gdx.app.getApplicationListener());
-        ((InitialScreen) pongGame.getScreen()).showSessionId(createSessionServerEvent.getSessionId());
+        ((InitialScreen) pongGame.getScreen()).showMessage("Waiting for another playerConnection. Session ID = " + createSessionServerEvent.getSessionId());
     }
 
     private void handleStartRoundEvent(StartRoundServerEvent startRoundServerEvent, Connection connection) {
@@ -76,5 +76,10 @@ public class ClientEventListener extends Listener {
             pongGame.getScreen().dispose();
             pongGame.setScreen(new InitialScreen());
         }));
+    }
+
+    private void handleWrongSessionIdServerEvent() {
+        PongGame pongGame = ((PongGame) Gdx.app.getApplicationListener());
+        ((InitialScreen) pongGame.getScreen()).showMessage("Provided session does not exist");
     }
 }

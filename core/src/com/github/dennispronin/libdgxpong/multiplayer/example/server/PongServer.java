@@ -9,10 +9,7 @@ import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.Crea
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.JoinSessionClientEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.MoveRectangleClientEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.ScoreHitClientEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.CreateSessionServerEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.MoveRectangleServerEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.PlayerDisconnectedServerEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.StartRoundServerEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.*;
 import com.github.dennispronin.libdgxpong.multiplayer.example.server.state.GameSession;
 
 import java.io.IOException;
@@ -121,7 +118,8 @@ public class PongServer {
     }
 
     private void handleJoinSessionEvent(JoinSessionClientEvent joinSessionClientEvent, Connection connection) {
-        Optional.ofNullable(gameSessions.get(joinSessionClientEvent.getSessionId())).ifPresent(session -> {
+        GameSession session = gameSessions.get(joinSessionClientEvent.getSessionId());
+        if (session != null) {
             if (session.getGuestPlayer() != null) {
                 return;
             }
@@ -145,6 +143,8 @@ public class PongServer {
             session.getHostPlayer().sendTCP(startRoundServerEvent);
             startRoundServerEvent.setPlayerSide(PlayerSide.RIGHT);
             session.getGuestPlayer().sendTCP(startRoundServerEvent);
-        });
+        } else {
+            connection.sendTCP(new WrongSessionIdServerEvent());
+        }
     }
 }

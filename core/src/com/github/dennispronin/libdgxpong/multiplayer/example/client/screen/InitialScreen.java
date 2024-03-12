@@ -2,6 +2,7 @@ package com.github.dennispronin.libdgxpong.multiplayer.example.client.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -32,6 +33,7 @@ public class InitialScreen implements Screen {
     private final TextField sessionPassword = new TextField("Enter session password", skin);
     private final TextButton joinButton = new TextButton("Join session", skin);
     private final TextButton createButton = new TextButton("Create session", skin);
+    private final Label informationMessage = new Label(null, skin);
 
     public InitialScreen() {
         this.menuLayout.setBounds(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -54,15 +56,15 @@ public class InitialScreen implements Screen {
                     connectToServer();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    menuLayout.clear();
-                    menuLayout.add(new Label("Server connection failed. Try again.", skin)).width(250).row();
+//                    menuLayout.clear();
+                    informationMessage.setText("Server connection failed. Try again.");
+//                    menuLayout.add(informationMessage).width(250).row();
                     return super.touchDown(event, x, y, pointer, button);
                 }
                 client.sendTCP(new JoinSessionClientEvent(sessionPassword.getText(), sessionId.getText()));
-                // fixme если такой сессии нет, то нужно это обрабатывать каким-то листенером
-                //  надо в лейбеле заменять надпись на то, что такой сессии нет
-                menuLayout.clear();
-                menuLayout.add(new Label("Joining game session", skin)).width(250).row();
+//                menuLayout.clear();
+                informationMessage.setText("Joining game session");
+//                menuLayout.add(informationMessage).width(250).row();
                 return super.touchDown(event, x, y, pointer, button);
             }
         });
@@ -76,8 +78,9 @@ public class InitialScreen implements Screen {
                     connectToServer();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    menuLayout.clear();
-                    menuLayout.add(new Label("Server connection failed. Try again.", skin)).width(250).row();
+//                    menuLayout.clear();
+                    informationMessage.setText("Server connection failed. Try again.");
+//                    menuLayout.add(informationMessage).width(250).row();
                     return super.touchDown(event, x, y, pointer, button);
                 }
                 client.sendTCP(new CreateSessionClientEvent(sessionPassword.getText()));
@@ -86,9 +89,10 @@ public class InitialScreen implements Screen {
         });
     }
 
-    public void showSessionId(String sessionId) {
-        menuLayout.clear();
-        menuLayout.add(new Label("Waiting for another playerConnection. Session ID = " + sessionId, skin)).width(250).row();
+    public void showMessage(String message) {
+//        menuLayout.clear();
+        informationMessage.setText(message);
+//        menuLayout.add(informationMessage).width(250).row();
     }
 
     private void fillLayout() {
@@ -97,6 +101,7 @@ public class InitialScreen implements Screen {
         this.menuLayout.add(this.port).width(250).padTop(25).row();
         this.menuLayout.add(this.sessionId).width(250).padTop(25).row();
         this.menuLayout.add(this.sessionPassword).width(250).padTop(25).row();
+        this.menuLayout.add(this.informationMessage).width(250).padTop(25).row();
         this.menuLayout.add(this.joinButton).size(150, 50).padTop(100).row();
         this.menuLayout.add(this.createButton).size(150, 50).padTop(25).row();
         this.stage.addActor(this.menuLayout);
@@ -115,6 +120,7 @@ public class InitialScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         this.stage.draw();
         this.stage.act(delta);
     }

@@ -27,18 +27,19 @@ public class GameScreen implements Screen {
     private final Sound ballSound;
     private float ballInitialX;
     private float ballInitialY;
+    private final Texture ballImage;
 
+    private final Texture rectangleImage;
     private final Rectangle leftRectangle;
     private final Rectangle rightRectangle;
+
+    private final BitmapFont font;
     private int leftPlayerScore;
     private int rightPlayerScore;
 
     private final OrthographicCamera camera;
     private final SpriteBatch spriteBatch;
 
-    private final BitmapFont font;
-    private final Texture ballImage;
-    private final Texture rectangleImage;
     private final Rectangle centerLine;
 
     private final PlayerSide playerSide;

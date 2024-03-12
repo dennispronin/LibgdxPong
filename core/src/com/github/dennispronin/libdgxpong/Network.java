@@ -7,10 +7,7 @@ import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.Crea
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.JoinSessionClientEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.MoveRectangleClientEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.ScoreHitClientEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.CreateSessionServerEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.MoveRectangleServerEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.PlayerDisconnectedServerEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.StartRoundServerEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.server.events.*;
 
 public class Network {
     public static final String SERVER_HOST = "localhost";
@@ -28,6 +25,7 @@ public class Network {
         kryo.register(MoveRectangleServerEvent.class);
         kryo.register(StartRoundServerEvent.class);
         kryo.register(PlayerDisconnectedServerEvent.class);
+        kryo.register(WrongSessionIdServerEvent.class);
         kryo.register(PlayerSide.class);
     }
 }
