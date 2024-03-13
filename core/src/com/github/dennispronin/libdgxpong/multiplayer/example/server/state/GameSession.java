@@ -10,11 +10,7 @@ public class GameSession {
     private Connection hostPlayerConnection;
     private Connection guestPlayerConnection;
     private int leftPlayerScore = 0;
-    /**
-     * For some reason the ball's initial x is 0, even though I set it in the create()
-     * It leads to scoreHit() being triggered and player2Score being incremented
-     */
-    private int rightPlayerScore = -1;
+    private int rightPlayerScore = 0;
 
     public void incrementScore(PlayerSide playerSide) {
         switch (playerSide) {

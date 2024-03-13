@@ -3,32 +3,24 @@ package com.github.dennispronin.libdgxpong.multiplayer.example.client.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.esotericsoftware.kryonet.Connection;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.PlayerSide;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.MoveRectangleClientEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.events.ScoreHitClientEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.example.client.object.Ball;
 
 import static com.github.dennispronin.libdgxpong.Constants.*;
 
 public class GameScreen implements Screen {
 
-    private final Rectangle ball;
-    private float ballSpeed = INITIAL_BALL_SPEED;
-    private float ballNextX;
-    private float ballNextY;
-    private final Sound ballSound;
-    private float ballInitialX;
-    private float ballInitialY;
-    private final Texture ballImage;
-
+    private final Ball ball;
     private final Texture rectangleImage;
     private final Rectangle leftRectangle;
     private final Rectangle rightRectangle;
@@ -45,16 +37,14 @@ public class GameScreen implements Screen {
     private final PlayerSide playerSide;
     private final Connection connection;
     private final String sessionId;
+    boolean isWaitingForServerResponse = false;
 
     public GameScreen(int leftPlayerScore, int rightPlayerScore, float ballInitialX, float ballInitialY, PlayerSide playerSide, Connection connection, String sessionId) {
         this.leftPlayerScore = leftPlayerScore;
         this.rightPlayerScore = rightPlayerScore;
-        this.ballInitialX = ballInitialX;
-        this.ballInitialY = ballInitialY;
         this.playerSide = playerSide;
         this.connection = connection;
         this.sessionId = sessionId;
-        ballImage = new Texture(Gdx.files.internal("ball.png"));
         rectangleImage = new Texture(Gdx.files.internal("rectangle.png"));
         camera = new OrthographicCamera();
         camera.setToOrtho(false, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -80,12 +70,7 @@ public class GameScreen implements Screen {
         centerLine.width = 3;
         centerLine.height = WINDOW_HEIGHT;
 
-        ball = new Rectangle();
-        ball.width = 40f;
-        ball.height = 40f;
-        ball.y = WINDOW_HEIGHT / 2 - ball.width / 2;
-        ball.x = WINDOW_WIDTH / 2 - ball.width / 2;
-        ballSound = Gdx.audio.newSound(Gdx.files.internal("ball.wav"));
+        ball = new Ball(ballInitialX, ballInitialY, playerSide);
     }
 
     @Override
@@ -93,14 +78,23 @@ public class GameScreen implements Screen {
         ScreenUtils.clear(Color.BLACK);
         camera.update();
         drawObjects();
-        handleBall();
+        ball.moveBall(leftRectangle, rightRectangle);
+        if (ball.areScreenSidesHit()) sendScoreEvent();
         handleKeyPressed();
+    }
+
+    private void sendScoreEvent() {
+        if (!isWaitingForServerResponse) {
+            connection.sendTCP(new ScoreHitClientEvent(playerSide, sessionId));
+            isWaitingForServerResponse= true;
+        }
     }
 
     private void drawObjects() {
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
-        spriteBatch.draw(ballImage, ball.x, ball.y, ball.width, ball.width);
+
+        ball.draw(spriteBatch);
 
         font.draw(spriteBatch, String.valueOf(leftPlayerScore), WINDOW_WIDTH / 2 - 20, WINDOW_HEIGHT - 20);
         font.draw(spriteBatch, String.valueOf(rightPlayerScore), WINDOW_WIDTH / 2 + 8, WINDOW_HEIGHT - 20);
@@ -111,22 +105,6 @@ public class GameScreen implements Screen {
         spriteBatch.end();
     }
 
-    public void handleBall() {
-        double vectorX = ballNextX - ball.x;
-        double vectorY = ballNextY - ball.y;
-        ball.x = ballNextX;
-        ball.y = ballNextY;
-        if (isRectangleHit()) {
-            ballSound.play();
-            deflectBallOfRectangle();
-            increaseBallSpeed();
-        } else if (isScoreHit()) {
-            sendScoreEvent();
-        } else {
-            moveBallForward(vectorX, vectorY);
-        }
-    }
-
     public void moveOtherPlayer(float y) {
         if (playerSide == PlayerSide.LEFT) {
             rightRectangle.y = y;
@@ -135,100 +113,11 @@ public class GameScreen implements Screen {
         }
     }
 
-    /**
-     * Player sends event to server about hitting other player
-     * Player does not send event about getting hit by other player
-     * I've made this logic to avoid duplicate score increments
-     */
-    private boolean isScoreHit() {
-        return (ball.x <= 0 && playerSide == PlayerSide.RIGHT)
-                || (ball.x + ball.width >= WINDOW_WIDTH && playerSide == PlayerSide.LEFT);
-    }
-
-    private void sendScoreEvent() {
-        connection.sendTCP(new ScoreHitClientEvent(playerSide, sessionId));
-    }
-
-    private void moveBallForward(double vectorX, double vectorY) {
-        if (vectorX > 0) {
-            if (ball.x + ballSpeed + ball.width < WINDOW_WIDTH) {
-                ballNextX += ballSpeed;
-            } else {
-                ballNextX += WINDOW_WIDTH - ball.x - ball.width;
-            }
-        } else if (vectorX < 0) {
-            if (ball.x - ballSpeed > 0) {
-                ballNextX -= ballSpeed;
-            } else {
-                ballNextX -= ball.x;
-            }
-        }
-        if (vectorY > 0) {
-            if (ball.y + ballSpeed + ball.width > WINDOW_HEIGHT) {
-                ballNextY -= ballSpeed;
-            } else {
-                ballNextY += ballSpeed;
-            }
-        } else if (vectorY < 0) {
-            if (ball.y - ballSpeed < 0) {
-                ballNextY += ballSpeed;
-            } else {
-                ballNextY -= ballSpeed;
-            }
-        }
-    }
-
-    private void deflectBallOfRectangle() {
-        if (Intersector.overlaps(ball, leftRectangle)) {
-            ballNextX += ballSpeed;
-            calculateRectangleHitYDirection(ball.y, leftRectangle.y);
-        } else if (Intersector.overlaps(ball, rightRectangle)) {
-            ballNextX -= ballSpeed;
-            calculateRectangleHitYDirection(ball.y, rightRectangle.y);
-        }
-    }
-
-    private void calculateRectangleHitYDirection(float ballY, float rectangleY) {
-        if (ballY < rectangleY + 40) {
-            // upper part of rectangle
-            ballNextY -= ballSpeed;
-        } else if (ballY < rectangleY + 50) {
-            // middle part of rectangle
-            ballNextY = ballY;
-        } else {
-            // lower part of rectangle
-            ballNextY += ballSpeed;
-        }
-    }
-
-    private boolean isRectangleHit() {
-        return Intersector.overlaps(ball, leftRectangle) || Intersector.overlaps(ball, rightRectangle);
-    }
-
-    public void resetBall() {
-        ball.x = WINDOW_WIDTH / 2 - ball.width / 2;
-        ball.y = WINDOW_HEIGHT / 2 - ball.width / 2;
-        ballSpeed = INITIAL_BALL_SPEED;
-        defineBallInitialDirection();
-    }
-
-    private void defineBallInitialDirection() {
-        if (ballInitialX == 0) {
-            this.ballNextX = ball.x + ballSpeed;
-        } else {
-            this.ballNextX = ball.x - ballSpeed;
-        }
-        if (ballInitialY == 0) {
-            this.ballNextY = ball.y + ballSpeed;
-        } else {
-            this.ballNextY = ball.y - ballSpeed;
-        }
-    }
-
-    private void increaseBallSpeed() {
-        if (ballSpeed != BALL_SPEED_LIMIT) {
-            ballSpeed += 0.5f;
-        }
+    public void startRound(int leftPlayerScore, int rightPlayerScore, float ballInitialX, float ballInitialY) {
+        this.leftPlayerScore = leftPlayerScore;
+        this.rightPlayerScore = rightPlayerScore;
+        this.isWaitingForServerResponse = false;
+        ball.reset(ballInitialX, ballInitialY);
     }
 
     private void handleKeyPressed() {
@@ -277,24 +166,8 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         font.dispose();
-        ballImage.dispose();
+        ball.dispose();
         rectangleImage.dispose();
         spriteBatch.dispose();
-    }
-
-    public void setLeftPlayerScore(int leftPlayerScore) {
-        this.leftPlayerScore = leftPlayerScore;
-    }
-
-    public void setRightPlayerScore(int rightPlayerScore) {
-        this.rightPlayerScore = rightPlayerScore;
-    }
-
-    public void setBallInitialX(float ballInitialX) {
-        this.ballInitialX = ballInitialX;
-    }
-
-    public void setBallInitialY(float ballInitialY) {
-        this.ballInitialY = ballInitialY;
     }
 }

@@ -55,11 +55,7 @@ public class ClientEventListener extends Listener {
                 ));
             } else {
                 GameScreen gameScreen = (GameScreen) pongGame.getScreen();
-                gameScreen.setLeftPlayerScore(leftPlayerScore);
-                gameScreen.setRightPlayerScore(rightPlayerScore);
-                gameScreen.setBallInitialX(ballInitialX);
-                gameScreen.setBallInitialY(ballInitialY);
-                gameScreen.resetBall();
+                gameScreen.startRound(leftPlayerScore, rightPlayerScore, ballInitialX, ballInitialY);
             }
         });
     }
@@ -77,6 +73,7 @@ public class ClientEventListener extends Listener {
             PongGame pongGame = ((PongGame) Gdx.app.getApplicationListener());
             pongGame.getScreen().dispose();
             pongGame.setScreen(new InitialScreen());
+            ((InitialScreen) pongGame.getScreen()).showMessage("Other player disconnected");
         }));
     }
 
