@@ -1,0 +1,15 @@
+sourceCompatibility = 1.8
+sourceSets.main.java.srcDirs = [ "src/" ]
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+project.ext.mainClassName = "com.github.dennispronin.libdgxpong.multiplayer.server.PongServer"
+
+sourceSets.main.java.srcDirs = [ "src/" ]
+
+tasks.register('runServer', JavaExec) {
+    dependsOn classes
+    mainClass = project.mainClassName
+    classpath = java.sourceSets.main.runtimeClasspath
+}
+
+eclipse.project.name = appName + "-server"

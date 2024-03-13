@@ -42,20 +42,24 @@ allprojects {
 
 project(":desktop") {
     apply plugin: "java-library"
-
-
     dependencies {
         implementation project(":core")
-        api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    }
+}
+
+project(":server") {
+    apply plugin: "java-library"
+    dependencies {
+        api "com.esotericsoftware:kryonet:2.22.0-RC1"
     }
 }
 
 project(":core") {
     apply plugin: "java-library"
-
     dependencies {
-        api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        implementation("com.esotericsoftware:kryonet:2.22.0-RC1")
+        implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+        implementation project(":server")
     }
 }
