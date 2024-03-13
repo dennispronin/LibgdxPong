@@ -3,6 +3,8 @@ package com.github.dennispronin.libdgxpong.multiplayer.example.server.state;
 import com.esotericsoftware.kryonet.Connection;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static java.util.Optional.ofNullable;
 
@@ -11,6 +13,10 @@ public class ServerState {
     private final Random random = new Random();
     private final Map<String, GameSession> gameSessions = new HashMap<>();
     private final Map<Connection, String> playersToGameSessionsId = new HashMap<>();
+
+    public ServerState() {
+        startCleanSessionsLoop(Executors.newSingleThreadExecutor());
+    }
 
     public int getRandomNumber() {
         return random.nextInt(2);
@@ -49,5 +55,20 @@ public class ServerState {
                     playersToGameSessionsId.remove(gameSession.getHostPlayer());
                     playersToGameSessionsId.remove(gameSession.getGuestPlayer());
                 });
+    }
+
+    public void startCleanSessionsLoop(ExecutorService executorService) {
+        while (true) {
+            executorService.execute(() -> gameSessions.values()
+                    .stream()
+                    .filter(GameSession::isOldSession)
+                    .forEach(session -> killSession(session.getSessionId()))
+            );
+            try {
+                Thread.sleep(100000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

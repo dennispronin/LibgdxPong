@@ -3,6 +3,8 @@ package com.github.dennispronin.libdgxpong.multiplayer.example.server.state;
 import com.esotericsoftware.kryonet.Connection;
 import com.github.dennispronin.libdgxpong.multiplayer.example.client.PlayerSide;
 
+import java.time.LocalDateTime;
+
 public class GameSession {
 
     private String sessionId;
@@ -11,6 +13,9 @@ public class GameSession {
     private Connection guestPlayerConnection;
     private int leftPlayerScore = 0;
     private int rightPlayerScore = 0;
+
+    private static final int SESSION_ALIVE_TIME_LIMIT_MINUTES = 60;
+    private final LocalDateTime createDateTime = LocalDateTime.now();
 
     public void incrementScore(PlayerSide playerSide) {
         switch (playerSide) {
@@ -61,5 +66,9 @@ public class GameSession {
 
     public void setGuestPlayer(Connection guestPlayerConnection) {
         this.guestPlayerConnection = guestPlayerConnection;
+    }
+
+    public boolean isOldSession() {
+        return createDateTime.plusMinutes(SESSION_ALIVE_TIME_LIMIT_MINUTES).isBefore(LocalDateTime.now());
     }
 }
