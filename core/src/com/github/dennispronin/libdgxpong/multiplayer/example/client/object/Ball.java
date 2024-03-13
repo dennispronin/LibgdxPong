@@ -26,11 +26,11 @@ public class Ball {
 
     public Ball(float ballInitialX, float ballInitialY, PlayerSide playerSide) {
         this.playerSide = playerSide;
-        this.rectangle = new Rectangle();
-        this.rectangle.width = 40f;
-        this.rectangle.height = 40f;
-        this.ballSound = Gdx.audio.newSound(Gdx.files.internal("ball.wav"));
-        this.ballImage = new Texture(Gdx.files.internal("ball.png"));
+        rectangle = new Rectangle();
+        rectangle.width = 40f;
+        rectangle.height = 40f;
+        ballSound = Gdx.audio.newSound(Gdx.files.internal("ball.wav"));
+        ballImage = new Texture(Gdx.files.internal("ball.png"));
         reset(ballInitialX, ballInitialY);
     }
 
