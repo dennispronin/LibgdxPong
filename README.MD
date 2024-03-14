@@ -1,4 +1,4 @@
-## JavaFXPong
+## Multiplayer Pong
 
 This is yet another multiplayer Pong implementation.
 
