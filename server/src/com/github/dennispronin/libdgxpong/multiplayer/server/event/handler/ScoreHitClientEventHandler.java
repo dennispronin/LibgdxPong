@@ -1,8 +1,8 @@
-package com.github.dennispronin.libdgxpong.multiplayer.server.events.handler;
+package com.github.dennispronin.libdgxpong.multiplayer.server.event.handler;
 
 import com.esotericsoftware.kryonet.Connection;
-import com.github.dennispronin.libdgxpong.multiplayer.server.events.ScoreHitClientEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.server.events.StartRoundServerEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.server.event.ScoreHitClientEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.server.event.StartRoundServerEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.server.state.ServerState;
 
 public class ScoreHitClientEventHandler implements EventHandler {

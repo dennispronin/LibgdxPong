@@ -3,8 +3,8 @@ package com.github.dennispronin.libdgxpong.multiplayer.server;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
-import com.github.dennispronin.libdgxpong.multiplayer.server.events.*;
-import com.github.dennispronin.libdgxpong.multiplayer.server.events.handler.*;
+import com.github.dennispronin.libdgxpong.multiplayer.server.event.*;
+import com.github.dennispronin.libdgxpong.multiplayer.server.event.handler.*;
 import com.github.dennispronin.libdgxpong.multiplayer.server.state.ServerState;
 
 import java.io.IOException;

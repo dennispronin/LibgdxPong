@@ -12,8 +12,8 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.esotericsoftware.kryonet.Client;
 import com.github.dennispronin.libdgxpong.multiplayer.server.Network;
 import com.github.dennispronin.libdgxpong.multiplayer.client.ClientEventListener;
-import com.github.dennispronin.libdgxpong.multiplayer.server.events.CreateSessionClientEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.server.events.JoinSessionClientEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.server.event.CreateSessionClientEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.server.event.JoinSessionClientEvent;
 
 import java.io.IOException;
 

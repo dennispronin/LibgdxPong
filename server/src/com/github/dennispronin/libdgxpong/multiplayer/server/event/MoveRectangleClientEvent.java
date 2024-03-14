@@ -1,4 +1,4 @@
-package com.github.dennispronin.libdgxpong.multiplayer.server.events;
+package com.github.dennispronin.libdgxpong.multiplayer.server.event;
 
 public class MoveRectangleClientEvent {
 

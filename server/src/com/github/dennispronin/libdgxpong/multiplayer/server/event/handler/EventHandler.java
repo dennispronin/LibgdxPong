@@ -1,4 +1,4 @@
-package com.github.dennispronin.libdgxpong.multiplayer.server.events.handler;
+package com.github.dennispronin.libdgxpong.multiplayer.server.event.handler;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.github.dennispronin.libdgxpong.multiplayer.server.state.ServerState;

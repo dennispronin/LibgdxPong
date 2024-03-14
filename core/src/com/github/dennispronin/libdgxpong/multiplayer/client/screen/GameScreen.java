@@ -11,8 +11,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.esotericsoftware.kryonet.Connection;
 import com.github.dennispronin.libdgxpong.multiplayer.server.state.PlayerSide;
-import com.github.dennispronin.libdgxpong.multiplayer.server.events.MoveRectangleClientEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.server.events.ScoreHitClientEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.server.event.MoveRectangleClientEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.server.event.ScoreHitClientEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.client.object.Ball;
 import com.github.dennispronin.libdgxpong.multiplayer.client.object.Paddle;
 

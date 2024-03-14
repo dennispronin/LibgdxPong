@@ -1,9 +1,9 @@
-package com.github.dennispronin.libdgxpong.multiplayer.server.events.handler;
+package com.github.dennispronin.libdgxpong.multiplayer.server.event.handler;
 
 import com.esotericsoftware.kryonet.Connection;
-import com.github.dennispronin.libdgxpong.multiplayer.server.events.JoinSessionClientEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.server.events.StartRoundServerEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.server.events.WrongSessionIdServerEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.server.event.JoinSessionClientEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.server.event.StartRoundServerEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.server.event.WrongSessionIdServerEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.server.state.GameSession;
 import com.github.dennispronin.libdgxpong.multiplayer.server.state.PlayerSide;
 import com.github.dennispronin.libdgxpong.multiplayer.server.state.ServerState;

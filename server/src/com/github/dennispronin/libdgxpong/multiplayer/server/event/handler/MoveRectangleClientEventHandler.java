@@ -1,8 +1,8 @@
-package com.github.dennispronin.libdgxpong.multiplayer.server.events.handler;
+package com.github.dennispronin.libdgxpong.multiplayer.server.event.handler;
 
 import com.esotericsoftware.kryonet.Connection;
-import com.github.dennispronin.libdgxpong.multiplayer.server.events.MoveRectangleClientEvent;
-import com.github.dennispronin.libdgxpong.multiplayer.server.events.MoveRectangleServerEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.server.event.MoveRectangleClientEvent;
+import com.github.dennispronin.libdgxpong.multiplayer.server.event.MoveRectangleServerEvent;
 import com.github.dennispronin.libdgxpong.multiplayer.server.state.ServerState;
 
 public class MoveRectangleClientEventHandler implements EventHandler {

@@ -5,7 +5,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.github.dennispronin.libdgxpong.multiplayer.client.screen.GameScreen;
 import com.github.dennispronin.libdgxpong.multiplayer.client.screen.InitialScreen;
-import com.github.dennispronin.libdgxpong.multiplayer.server.events.*;
+import com.github.dennispronin.libdgxpong.multiplayer.server.event.*;
 
 public class ClientEventListener extends Listener {
 
